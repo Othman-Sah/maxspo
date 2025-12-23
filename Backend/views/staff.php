@@ -1,175 +1,138 @@
 <?php
 /**
- * Staff / Équipe View
- * Team members, roles, and management
+ * Staff / Team View
+ * Team members management with roles and status - matching React StaffView
  */
 
-require_once ROOT_PATH . '/controllers/DashboardController.php';
-require_once ROOT_PATH . '/components/Layout.php';
-require_once ROOT_PATH . '/helpers/Icons.php';
+require_once 'config/config.php';
+require_once 'controllers/StaffController.php';
+require_once 'components/Layout.php';
+require_once 'helpers/Icons.php';
 
-$controller = new DashboardController($db);
+requireLogin();
+
+$controller = new StaffController($db);
+$staffList = $controller->getAll();
 $currentPage = 'staff';
+
+function getStatusBadgeInfo($status) {
+    $badges = [
+        'present' => ['class' => 'bg-emerald-50 text-emerald-600 border border-emerald-100', 'icon' => 'badge-check', 'label' => 'Présent'],
+        'absent' => ['class' => 'bg-rose-50 text-rose-600 border border-rose-100', 'icon' => 'user-x', 'label' => 'Absent'],
+        'en_pause' => ['class' => 'bg-amber-50 text-amber-600 border border-amber-100', 'icon' => 'clock', 'label' => 'En Pause'],
+    ];
+    return $badges[$status] ?? $badges['present'];
+}
 ?>
 
-<?php renderHeader(); ?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEEDSPORT Pro - Gestion de l'Équipe</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .animate-in { animation: animateIn 0.5s ease-out forwards; }
+        @keyframes animateIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div class="flex min-h-screen">
+        <?php renderSidebar($currentPage); ?>
 
-<div class="flex h-screen bg-slate-50">
-    <?php renderSidebar($currentPage); ?>
+        <main class="flex-1 min-w-0 overflow-auto">
+            <?php renderHeader(); ?>
 
-    <main class="flex-1 overflow-auto">
-        <div class="p-8 space-y-8">
-            <!-- Header -->
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-black text-slate-900">Équipe Staff</h1>
-                    <p class="text-slate-500 mt-1"><?php echo 6; ?> membres de l'équipe</p>
+            <div class="p-8 space-y-8 animate-in">
+                <!-- Header Section -->
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
+                            <?php echo icon('user-check', 32, 'text-indigo-600'); ?>
+                            Gestion de l'Équipe
+                        </h1>
+                        <p class="text-slate-500 font-medium mt-1">Gérez vos coachs, réceptionnistes et personnel technique.</p>
+                    </div>
+                    <button class="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100 group active:scale-95">
+                        <?php echo icon('plus', 20, 'group-hover:rotate-90 transition-transform duration-300'); ?>
+                        Ajouter un Staff
+                    </button>
                 </div>
-                <button class="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all flex items-center gap-2">
-                    <?php echo plusIcon(18); ?>
-                    Ajouter Membre
-                </button>
-            </div>
 
-            <!-- Staff Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <?php
-                $staff = [
-                    ['name' => 'Ahmed Hassan', 'role' => 'Directeur Général', 'specialty' => 'Gestion', 'status' => 'Actif', 'experience' => '12 ans'],
-                    ['name' => 'Mohamed El Kouri', 'role' => 'Entraîneur Football', 'specialty' => 'Football', 'status' => 'Actif', 'experience' => '8 ans'],
-                    ['name' => 'Fatima Bennani', 'role' => 'Entraîneuse Musculation', 'specialty' => 'Fitness', 'status' => 'Actif', 'experience' => '6 ans'],
-                    ['name' => 'Sara Alami', 'role' => 'Instructrice Yoga', 'specialty' => 'Yoga', 'status' => 'Actif', 'experience' => '5 ans'],
-                    ['name' => 'Karim Tijani', 'role' => 'Réceptionniste', 'specialty' => 'Accueil', 'status' => 'Actif', 'experience' => '3 ans'],
-                    ['name' => 'Laila Bensaid', 'role' => 'Responsable Comptabilité', 'specialty' => 'Finances', 'status' => 'Actif', 'experience' => '7 ans'],
-                ];
-                
-                foreach ($staff as $member):
-                    $initials = substr($member['name'], 0, 1) . substr(explode(' ', $member['name'])[1], 0, 1);
-                ?>
-                <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden hover:shadow-lg transition-all group">
-                    <!-- Header with color -->
-                    <div class="h-2 bg-gradient-to-r from-indigo-500 to-blue-600"></div>
+                <!-- Staff Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    <?php foreach ($staffList as $staff):
+                        $initials = implode('', array_map(fn($n) => substr($n, 0, 1), explode(' ', $staff['name'])));
+                        $badgeInfo = getStatusBadgeInfo($staff['status']);
+                    ?>
+                        <div class="bg-white rounded-[32px] border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 p-6 flex flex-col group overflow-hidden relative">
+                            <div class="absolute top-0 right-0 p-4">
+                               <button class="p-2 text-slate-300 hover:text-slate-900 transition-colors">
+                                 <?php echo icon('more-vertical', 20); ?>
+                               </button>
+                            </div>
+                            
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="h-16 w-16 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 font-black text-2xl group-hover:scale-105 transition-transform">
+                                    <?php echo htmlspecialchars($initials); ?>
+                                </div>
+                                <div class="min-w-0">
+                                    <h3 class="text-lg font-black text-slate-900 truncate"><?php echo htmlspecialchars($staff['name']); ?></h3>
+                                    <p class="text-xs font-bold text-slate-400 uppercase tracking-tighter"><?php echo htmlspecialchars($staff['role']); ?></p>
+                                </div>
+                            </div>
+
+                            <div class="space-y-3 mb-6 flex-1">
+                                <div class="flex items-center justify-between p-3 bg-slate-50 rounded-2xl">
+                                    <span class="text-[10px] font-black uppercase text-slate-400">Statut Actuel</span>
+                                    <span class="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-black uppercase rounded-lg <?php echo $badgeInfo['class']; ?>">
+                                        <?php echo icon($badgeInfo['icon'], 12); ?> <?php echo $badgeInfo['label']; ?>
+                                    </span>
+                                </div>
+                              
+                                <div class="flex items-center gap-3 text-slate-500">
+                                    <?php echo icon('phone', 14); ?>
+                                    <span class="text-sm font-bold"><?php echo htmlspecialchars($staff['phone']); ?></span>
+                                </div>
+                                <div class="flex items-center gap-3 text-slate-500">
+                                    <?php echo icon('mail', 14); ?>
+                                    <span class="text-sm font-bold truncate"><?php echo htmlspecialchars($staff['email']); ?></span>
+                                </div>
+                            </div>
+
+                            <div class="pt-4 border-t border-slate-50 flex items-center justify-between">
+                                <div>
+                                    <p class="text-[10px] font-black uppercase text-slate-400">Salaire</p>
+                                    <p class="text-sm font-black text-slate-900"><?php echo number_format($staff['salary']); ?> DH</p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="p-2 text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-xl transition-colors">
+                                        <?php echo icon('edit', 16); ?>
+                                    </button>
+                                    <button class="p-2 text-rose-500 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors">
+                                        <?php echo icon('user-minus', 16); ?>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
                     
-                    <div class="p-6">
-                        <!-- Avatar -->
-                        <div class="h-16 w-16 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-600 font-black text-lg mb-4 border-2 border-white shadow-sm">
-                            <?php echo $initials; ?>
+                    <!-- Add Staff Placeholder -->
+                    <div class="border-2 border-dashed border-slate-100 rounded-[32px] p-6 flex flex-col items-center justify-center text-center space-y-4 hover:border-indigo-300 hover:bg-indigo-50/30 transition-all cursor-pointer group py-12">
+                        <div class="h-16 w-16 rounded-full bg-slate-50 text-slate-300 flex items-center justify-center group-hover:bg-white group-hover:text-indigo-500 transition-all">
+                            <?php echo icon('plus', 32); ?>
                         </div>
-
-                        <!-- Info -->
-                        <h3 class="text-lg font-bold text-slate-900"><?php echo $member['name']; ?></h3>
-                        <p class="text-sm font-semibold text-indigo-600 mt-1"><?php echo $member['role']; ?></p>
-                        
-                        <div class="mt-4 space-y-2 text-sm">
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">Spécialité:</span>
-                                <span class="font-semibold text-slate-900"><?php echo $member['specialty']; ?></span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-slate-500">Expérience:</span>
-                                <span class="font-semibold text-slate-900"><?php echo $member['experience']; ?></span>
-                            </div>
-                        </div>
-
-                        <!-- Status Badge -->
-                        <div class="mt-4 flex items-center gap-2">
-                            <?php echo checkIcon(14); ?>
-                            <span class="text-xs font-bold text-emerald-600"><?php echo $member['status']; ?></span>
-                        </div>
-
-                        <!-- Actions -->
-                        <div class="mt-6 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button class="flex-1 py-2 bg-indigo-600 text-white font-bold text-sm rounded-lg hover:bg-indigo-700 transition-all flex items-center justify-center gap-1">
-                                <?php echo editIcon(14); ?> Modifier
-                            </button>
-                            <button class="py-2 px-3 bg-rose-50 text-rose-600 font-bold text-sm rounded-lg hover:bg-rose-100 transition-all">
-                                <?php echo trashIcon(14); ?>
-                            </button>
+                        <div>
+                            <h4 class="text-sm font-black text-slate-900">Nouveau membre</h4>
+                            <p class="text-xs text-slate-400 font-medium">Recruter un nouveau coach</p>
                         </div>
                     </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-
-            <!-- Staff Statistics -->
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div class="bg-white p-6 rounded-2xl border border-slate-100">
-                    <p class="text-slate-500 text-sm font-medium">Total Staff</p>
-                    <h3 class="text-3xl font-black text-slate-900 mt-2"><?php echo count($staff); ?></h3>
-                    <p class="text-xs text-emerald-600 font-bold mt-2">100% Actif</p>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-slate-100">
-                    <p class="text-slate-500 text-sm font-medium">Entraîneurs</p>
-                    <h3 class="text-3xl font-black text-slate-900 mt-2">4</h3>
-                    <p class="text-xs text-slate-500 font-bold mt-2">Spécialistes</p>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-slate-100">
-                    <p class="text-slate-500 text-sm font-medium">Exp. Moyenne</p>
-                    <h3 class="text-3xl font-black text-slate-900 mt-2">6.8</h3>
-                    <p class="text-xs text-slate-500 font-bold mt-2">ans</p>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl border border-slate-100">
-                    <p class="text-slate-500 text-sm font-medium">Masse Salariale</p>
-                    <h3 class="text-3xl font-black text-slate-900 mt-2">4,500</h3>
-                    <p class="text-xs text-slate-500 font-bold mt-2">DH/mois</p>
                 </div>
             </div>
-
-            <!-- Add Staff Form -->
-            <div class="bg-white rounded-2xl border border-slate-100 p-8">
-                <h2 class="text-xl font-bold text-slate-900 mb-6">Ajouter Membre Staff</h2>
-                <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Nom Complet</label>
-                        <input type="text" placeholder="Ex: Ahmed Hassan" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold" />
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Email</label>
-                        <input type="email" placeholder="email@example.com" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold" />
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Rôle</label>
-                        <select class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold">
-                            <option>Directeur</option>
-                            <option>Entraîneur</option>
-                            <option>Réceptionniste</option>
-                            <option>Comptable</option>
-                            <option>Autre</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Spécialité</label>
-                        <select class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold">
-                            <option>Fitness</option>
-                            <option>Football</option>
-                            <option>Yoga</option>
-                            <option>Musculation</option>
-                            <option>Gestion</option>
-                            <option>Accueil</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Téléphone</label>
-                        <input type="tel" placeholder="06 12 34 56 78" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold" />
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Salaire Mensuel</label>
-                        <input type="number" placeholder="3000" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold" />
-                    </div>
-                    <div class="md:col-span-2 flex gap-3">
-                        <button type="submit" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
-                            <?php echo checkIcon(18); ?>
-                            Ajouter Membre
-                        </button>
-                        <button type="reset" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all">
-                            Annuler
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </main>
-</div>
+        </main>
+    </div>
+</body>
+</html>

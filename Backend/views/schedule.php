@@ -1,183 +1,146 @@
 <?php
 /**
  * Schedule / Planning View
- * Weekly calendar with activities and time slots
+ * Weekly calendar with activities and time slots - matching React ScheduleView
  */
 
-require_once ROOT_PATH . '/controllers/DashboardController.php';
-require_once ROOT_PATH . '/components/Layout.php';
-require_once ROOT_PATH . '/helpers/Icons.php';
+require_once 'config/config.php';
+require_once 'controllers/ScheduleController.php';
+require_once 'components/Layout.php';
+require_once 'helpers/Icons.php';
 
-$controller = new DashboardController($db);
+requireLogin();
+
+$controller = new ScheduleController($db);
+$scheduleData = $controller->getWeeklySchedule();
+$days = $controller->getDays();
+$timeBlocks = $controller->getTimeBlocks();
 $currentPage = 'schedule';
 ?>
 
-<?php renderHeader(); ?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEEDSPORT Pro - Planning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .animate-in { animation: animateIn 0.5s ease-out forwards; }
+        @keyframes animateIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50">
+    <div class="flex min-h-screen">
+        <?php renderSidebar($currentPage); ?>
 
-<div class="flex h-screen bg-slate-50">
-    <?php renderSidebar($currentPage); ?>
+        <main class="flex-1 min-w-0 overflow-auto">
+            <?php renderHeader(); ?>
 
-    <main class="flex-1 overflow-auto">
-        <div class="p-8 space-y-8">
-            <!-- Header -->
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-black text-slate-900">Planning</h1>
-                    <p class="text-slate-500 mt-1">Semaine du 20 au 26 Décembre 2024</p>
-                </div>
-                <button class="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all flex items-center gap-2">
-                    <?php echo plusIcon(18); ?>
-                    Ajouter Session
-                </button>
-            </div>
-
-            <!-- Week Navigation -->
-            <div class="bg-white rounded-2xl border border-slate-100 p-4 flex items-center justify-between">
-                <button class="p-2 hover:bg-slate-100 rounded-lg transition">
-                    <?php echo icon('chevron-left', 20); ?>
-                </button>
-                <div class="text-center">
-                    <p class="text-sm font-bold text-slate-500 uppercase">Semaine actuelle</p>
-                    <p class="text-lg font-black text-slate-900">20 - 26 Dec 2024</p>
-                </div>
-                <button class="p-2 hover:bg-slate-100 rounded-lg transition">
-                    <?php echo icon('chevron-right', 20); ?>
-                </button>
-            </div>
-
-            <!-- Weekly Calendar -->
-            <div class="grid grid-cols-7 gap-4">
-                <?php
-                $days = [
-                    ['name' => 'Lun', 'date' => '20', 'sessions' => 3],
-                    ['name' => 'Mar', 'date' => '21', 'sessions' => 2],
-                    ['name' => 'Mer', 'date' => '22', 'sessions' => 4],
-                    ['name' => 'Jeu', 'date' => '23', 'sessions' => 3],
-                    ['name' => 'Ven', 'date' => '24', 'sessions' => 2],
-                    ['name' => 'Sam', 'date' => '25', 'sessions' => 5],
-                    ['name' => 'Dim', 'date' => '26', 'sessions' => 1],
-                ];
-
-                foreach ($days as $day):
-                    $isToday = $day['date'] === '23';
-                    $dayClass = $isToday ? 'bg-indigo-50 border-indigo-200' : 'bg-white';
-                ?>
-                <div class="<?php echo $dayClass; ?> rounded-2xl border border-slate-100 p-4 text-center">
-                    <p class="text-sm font-bold text-slate-500 uppercase"><?php echo $day['name']; ?></p>
-                    <p class="text-3xl font-black text-slate-900 my-2"><?php echo $day['date']; ?></p>
-                    <div class="space-y-2">
-                        <?php for ($i = 0; $i < min($day['sessions'], 3); $i++): ?>
-                            <div class="text-xs px-2 py-1 rounded-lg bg-emerald-100 text-emerald-700 font-semibold truncate">
-                                Session <?php echo $i + 1; ?>
-                            </div>
-                        <?php endfor; ?>
-                        <?php if ($day['sessions'] > 3): ?>
-                            <p class="text-[10px] text-slate-500 font-bold">+<?php echo $day['sessions'] - 3; ?> de plus</p>
-                        <?php endif; ?>
+            <div class="p-8 space-y-8 animate-in pb-12">
+                <!-- Header Section -->
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                        <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
+                            <?php echo icon('calendar-days', 32, 'text-indigo-600'); ?>
+                            Planning de la Semaine
+                        </h1>
+                        <p class="text-slate-500 font-medium mt-1">Gérez les créneaux horaires et l'occupation des salles par activité.</p>
                     </div>
-                </div>
-                <?php endforeach; ?>
-            </div>
-
-            <!-- Detailed Schedule -->
-            <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-                <div class="p-6 border-b border-slate-100">
-                    <h2 class="text-lg font-bold text-slate-900">Mercredi 22 Décembre</h2>
-                </div>
-                
-                <div class="divide-y divide-slate-100">
-                    <?php
-                    $sessions = [
-                        ['time' => '06:00 - 07:30', 'activity' => 'Fitness / Cardio', 'trainer' => 'Ahmed Hassan', 'capacity' => '15/20', 'status' => 'Confirmé'],
-                        ['time' => '07:30 - 09:00', 'activity' => 'Football', 'trainer' => 'Mohamed El Kouri', 'capacity' => '22/22', 'status' => 'Complet'],
-                        ['time' => '09:00 - 10:30', 'activity' => 'Musculation', 'trainer' => 'Fatima Bennani', 'capacity' => '8/15', 'status' => 'Confirmé'],
-                        ['time' => '17:00 - 18:30', 'activity' => 'Yoga', 'trainer' => 'Sara Alami', 'capacity' => '12/20', 'status' => 'Confirmé'],
-                    ];
-
-                    foreach ($sessions as $session):
-                    ?>
-                    <div class="p-6 hover:bg-slate-50 transition-colors flex items-center justify-between group">
-                        <div class="flex-1">
-                            <div class="flex items-center gap-4">
-                                <div class="text-left">
-                                    <p class="text-sm font-black text-slate-600"><?php echo $session['time']; ?></p>
-                                    <p class="text-lg font-bold text-slate-900 mt-1"><?php echo $session['activity']; ?></p>
-                                </div>
-                                <div class="text-left ml-8">
-                                    <p class="text-xs text-slate-500 font-bold">Entraîneur</p>
-                                    <p class="text-sm font-semibold text-slate-900"><?php echo $session['trainer']; ?></p>
-                                </div>
-                                <div class="text-left ml-8">
-                                    <p class="text-xs text-slate-500 font-bold">Capacité</p>
-                                    <p class="text-sm font-semibold text-slate-900"><?php echo $session['capacity']; ?></p>
-                                </div>
-                            </div>
+                    <div class="flex items-center gap-3">
+                        <div class="flex bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+                            <button class="p-2 hover:bg-slate-50 rounded-lg text-slate-400"><?php echo icon('chevron-left', 18); ?></button>
+                            <div class="px-4 flex items-center font-bold text-sm text-slate-700">10 Juin - 16 Juin</div>
+                            <button class="p-2 hover:bg-slate-50 rounded-lg text-slate-400"><?php echo icon('chevron-right', 18); ?></button>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <span class="px-3 py-1 text-xs font-bold rounded-full bg-emerald-50 text-emerald-600">
-                                <?php echo checkIcon(14); ?> <?php echo $session['status']; ?>
-                            </span>
-                            <button class="p-2 hover:bg-slate-200 rounded-lg transition opacity-0 group-hover:opacity-100">
-                                <?php echo editIcon(18); ?>
-                            </button>
-                            <button class="p-2 hover:bg-rose-100 rounded-lg transition opacity-0 group-hover:opacity-100 text-rose-600">
-                                <?php echo trashIcon(18); ?>
-                            </button>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-
-            <!-- Add Session Form -->
-            <div class="bg-white rounded-2xl border border-slate-100 p-8">
-                <h2 class="text-xl font-bold text-slate-900 mb-6">Ajouter une Nouvelle Session</h2>
-                <form class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Activité</label>
-                        <select class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold">
-                            <option>Fitness / Cardio</option>
-                            <option>Football</option>
-                            <option>Musculation</option>
-                            <option>Yoga</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Entraîneur</label>
-                        <select class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold">
-                            <option>Ahmed Hassan</option>
-                            <option>Mohamed El Kouri</option>
-                            <option>Fatima Bennani</option>
-                            <option>Sara Alami</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Date</label>
-                        <input type="date" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold" />
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Heure de Début</label>
-                        <input type="time" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold" />
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Heure de Fin</label>
-                        <input type="time" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold" />
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Capacité Maximale</label>
-                        <input type="number" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold" />
-                    </div>
-                    <div class="md:col-span-2 flex gap-3">
-                        <button type="submit" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2">
-                            <?php echo checkIcon(18); ?>
-                            Créer Session
-                        </button>
-                        <button type="reset" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all">
-                            Annuler
+                        <button class="flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg shadow-slate-200 group">
+                            <?php echo icon('settings-2', 18, 'group-hover:rotate-180 transition-transform duration-500'); ?>
+                            Modifier le planning
                         </button>
                     </div>
-                </form>
+                </div>
+
+                <!-- Schedule Table -->
+                <div class="bg-white rounded-[32px] border border-slate-100 shadow-xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50/50 border-b border-slate-100">
+                                    <th class="p-6 w-40"></th>
+                                    <?php foreach ($days as $index => $day): ?>
+                                        <th class="p-6 text-center">
+                                            <span class="text-xs font-black uppercase text-slate-400 tracking-widest block mb-1"><?php echo $day; ?></span>
+                                            <span class="text-lg font-black text-slate-900"><?php echo 10 + $index; ?></span>
+                                        </th>
+                                    <?php endforeach; ?>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($timeBlocks as $timeBlock): ?>
+                                    <tr class="border-b border-slate-50 last:border-0">
+                                        <td class="p-8 bg-slate-50/30">
+                                            <div class="flex flex-col">
+                                                <span class="text-sm font-black text-slate-900"><?php echo $timeBlock['label']; ?></span>
+                                                <span class="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1 mt-1">
+                                                    <?php echo icon('clock', 10); ?>
+                                                    <?php echo $timeBlock['time']; ?>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <?php foreach ($days as $day):
+                                            $slot = null;
+                                            foreach ($scheduleData as $s) {
+                                                if ($s['day'] === $day && $s['block'] === $timeBlock['id']) {
+                                                    $slot = $s;
+                                                    break;
+                                                }
+                                            }
+                                        ?>
+                                            <td class="p-2 min-w-[160px]">
+                                                <?php if ($slot): ?>
+                                                    <div class="<?php echo $slot['color']; ?> p-4 rounded-2xl text-white shadow-lg shadow-slate-200 transition-all hover:scale-[1.02] cursor-pointer group relative overflow-hidden">
+                                                        <?php echo icon($slot['icon'], 48, 'absolute -right-2 -bottom-2 opacity-10 group-hover:scale-125 transition-transform'); ?>
+                                                        <div class="relative z-10 space-y-3">
+                                                            <div class="flex items-center justify-between">
+                                                                <?php echo icon($slot['icon'], 16); ?>
+                                                                <span class="text-[8px] font-black uppercase px-2 py-0.5 rounded-full <?php echo $slot['capacity'] === 'Complet' ? 'bg-rose-600' : 'bg-black/20'; ?>">
+                                                                    <?php echo htmlspecialchars($slot['capacity']); ?>
+                                                                </span>
+                                                            </div>
+                                                            <h4 class="text-xs font-black leading-tight"><?php echo htmlspecialchars($slot['activity']); ?></h4>
+                                                        </div>
+                                                    </div>
+                                                <?php else: ?>
+                                                    <div class="h-24 w-full border-2 border-dashed border-slate-50 rounded-2xl flex items-center justify-center group hover:border-indigo-100 hover:bg-indigo-50/30 transition-all cursor-pointer">
+                                                        <?php echo icon('plus', 16, 'text-slate-200 group-hover:text-indigo-400'); ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                            </td>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Legend & Info -->
+                <div class="flex flex-wrap items-center justify-between gap-6 p-6 bg-white rounded-3xl border border-slate-100 shadow-sm">
+                    <div class="flex flex-wrap items-center gap-6">
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-indigo-600"></div><span class="text-xs font-bold text-slate-500">Fitness</span></div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-rose-500"></div><span class="text-xs font-bold text-slate-500">Boxe</span></div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-emerald-500"></div><span class="text-xs font-bold text-slate-500">Yoga</span></div>
+                        <div class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-amber-500"></div><span class="text-xs font-bold text-slate-500">CrossFit</span></div>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] font-black uppercase text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-full border border-indigo-100">
+                        <?php echo icon('info', 12); ?>
+                        Mise à jour en temps réel
+                    </div>
+                </div>
             </div>
-        </div>
-    </main>
-</div>
+        </main>
+    </div>
+</body>
+</html>
