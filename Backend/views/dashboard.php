@@ -8,6 +8,7 @@ require_once 'config/Models.php';
 require_once 'controllers/DashboardController.php';
 require_once 'components/Components.php';
 require_once 'components/Layout.php';
+require_once 'components/Notifications.php';
 
 requireLogin();
 
@@ -136,6 +137,7 @@ $activities = $dashboardCtrl->getActivities();
             </div>
         </main>
     </div>
+    <?php renderDropdownScript(); ?>
 </body>
 </html>
 <?php

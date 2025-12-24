@@ -11,182 +11,207 @@ require_once ROOT_PATH . '/helpers/Icons.php';
 $controller = new DashboardController($db);
 $currentPage = 'sports';
 
+// Mock data for icons and colors, similar to the React component
+$icons = [
+    ['id' => 'Dumbbell', 'label' => 'Muscu'],
+    ['id' => 'Target', 'label' => 'Cible'],
+    ['id' => 'flower-2', 'label' => 'Zen'],
+    ['id' => 'Flame', 'label' => 'Intense'],
+];
+
+$colors = [
+    ['id' => 'indigo', 'class' => 'from-indigo-500 to-blue-600'],
+    ['id' => 'rose', 'class' => 'from-rose-500 to-red-600'],
+    ['id' => 'emerald', 'class' => 'from-emerald-500 to-teal-600'],
+    ['id' => 'amber', 'class' => 'from-amber-500 to-orange-600'],
+];
+
+$name = $_POST['name'] ?? '';
+$selectedIcon = $_POST['selectedIcon'] ?? 'Dumbbell';
+$selectedColor = $_POST['selectedColor'] ?? 'indigo';
+$price = $_POST['price'] ?? '250';
+
 $success = null;
 $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $data = [
-        'name' => $_POST['name'] ?? '',
-        'description' => $_POST['description'] ?? '',
-        'monthlyPrice' => $_POST['monthlyPrice'] ?? 0,
-        'maxCapacity' => $_POST['maxCapacity'] ?? 0,
-        'duration' => $_POST['duration'] ?? '',
-        'trainer' => $_POST['trainer'] ?? '',
-    ];
-
-    // Validation
-    if (empty($data['name']) || empty($data['trainer'])) {
-        $error = "Veuillez remplir tous les champs obligatoires";
+    // Simple validation
+    if (empty($name) || empty($price)) {
+        $error = "Veuillez remplir tous les champs obligatoires.";
     } else {
-        $success = "Activité '{$data['name']}' a été créée avec succès!";
+        // Here you would typically insert into the database
+        // For now, just show a success message
+        $success = "L'activité '{$name}' a été créée avec succès !";
     }
 }
+
+$selectedColorClass = 'from-indigo-500 to-blue-600';
+foreach ($colors as $color) {
+    if ($color['id'] === $selectedColor) {
+        $selectedColorClass = $color['class'];
+    }
+}
+
 ?>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEEDSPORT Pro - Nouvelle Activité</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .animate-in {
+            animation: animateIn 0.5s ease-out forwards;
+        }
+        @keyframes animateIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="flex h-screen bg-slate-50">
+        <?php renderSidebar($currentPage); ?>
 
-<?php renderHeader(); ?>
+        <main class="flex-1 overflow-auto">
+            <?php renderHeader(); ?>
 
-<div class="flex h-screen bg-slate-50">
-    <?php renderSidebar($currentPage); ?>
+            <div class="animate-in max-w-4xl mx-auto space-y-8 p-8">
+                <div class="flex items-center justify-between">
+                    <a href="index.php?page=sports" class="flex items-center gap-2 text-slate-500 hover:text-indigo-600 font-bold transition-colors">
+                        <?php echo icon('chevron-left', 20); ?> Retour
+                    </a>
+                    <h1 class="text-2xl font-black text-slate-900">Nouvelle Activité Sportive</h1>
+                </div>
 
-    <main class="flex-1 overflow-auto">
-        <div class="p-8 max-w-4xl">
-            <!-- Header -->
-            <div class="mb-8">
-                <h1 class="text-3xl font-black text-slate-900">Ajouter une Activité</h1>
-                <p class="text-slate-500 mt-1">Créer un nouveau cours ou activité de sport</p>
-            </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 space-y-6">
+                        <form method="POST" action="index.php?page=add-activity" class="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm space-y-6">
+                            <input type="hidden" name="selectedIcon" id="selectedIcon" value="<?php echo htmlspecialchars($selectedIcon); ?>">
+                            <input type="hidden" name="selectedColor" id="selectedColor" value="<?php echo htmlspecialchars($selectedColor); ?>">
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Form -->
-                <div class="lg:col-span-2">
-                    <div class="bg-white rounded-2xl border border-slate-100 p-8">
-                        <?php if ($error): ?>
-                            <div class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-medium flex items-center gap-2">
-                                <?php echo icon('alert', 16); ?> <?php echo htmlspecialchars($error); ?>
-                            </div>
-                        <?php endif; ?>
+                            <?php if ($error): ?>
+                                <div class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-xl text-rose-700 text-sm font-medium flex items-center gap-2">
+                                    <?php echo icon('alert-triangle', 16); ?> <?php echo htmlspecialchars($error); ?>
+                                </div>
+                            <?php endif; ?>
 
-                        <?php if ($success): ?>
-                            <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-sm font-medium flex items-center gap-2">
-                                <?php echo checkIcon(16); ?> <?php echo htmlspecialchars($success); ?>
-                            </div>
-                        <?php endif; ?>
+                            <?php if ($success): ?>
+                                <div class="mb-6 p-4 bg-emerald-50 border border-emerald-100 rounded-xl text-emerald-700 text-sm font-medium flex items-center gap-2">
+                                    <?php echo icon('check-circle', 16); ?> <?php echo htmlspecialchars($success); ?>
+                                </div>
+                            <?php endif; ?>
 
-                        <form method="POST" class="space-y-6">
-                            <!-- Activity Name -->
-                            <div>
-                                <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Nom de l'Activité *</label>
+                            <div class="space-y-2">
+                                <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Nom du Sport</label>
                                 <input 
                                     type="text" 
                                     name="name"
-                                    placeholder="Ex: Zumba, Pilates, CrossFit..."
-                                    class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold"
                                     required
+                                    placeholder="Ex: Muay Thaï"
+                                    class="w-full px-5 py-4 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-2xl outline-none transition-all font-bold text-lg"
+                                    value="<?php echo htmlspecialchars($name); ?>"
                                 />
                             </div>
 
-                            <!-- Description -->
-                            <div>
-                                <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Description</label>
-                                <textarea 
-                                    name="description"
-                                    placeholder="Décrivez l'activité, les bénéfices, le public cible..."
-                                    rows="4"
-                                    class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold"
-                                ></textarea>
-                            </div>
-
-                            <!-- Price and Capacity -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Prix Mensuel (DH) *</label>
-                                    <input 
-                                        type="number" 
-                                        name="monthlyPrice"
-                                        placeholder="500"
-                                        class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Capacité Maximale *</label>
-                                    <input 
-                                        type="number" 
-                                        name="maxCapacity"
-                                        placeholder="20"
-                                        class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold"
-                                        required
-                                    />
+                            <div class="space-y-4">
+                                <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Icône Représentative</label>
+                                <div class="grid grid-cols-4 gap-4">
+                                    <?php foreach ($icons as $item): ?>
+                                        <button
+                                            type="button"
+                                            onclick="document.getElementById('selectedIcon').value='<?php echo $item['id']; ?>'; document.getElementById('previewIcon').innerHTML = this.innerHTML; document.getElementById('previewIcon').className = this.children[0].className; "
+                                            class="flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all <?php echo $selectedIcon === $item['id'] ? 'border-indigo-500 bg-indigo-50 text-indigo-600' : 'border-slate-50 text-slate-400 hover:border-slate-200'; ?>"
+                                        >
+                                            <?php echo icon(strtolower($item['id']), 24); ?>
+                                            <span class="text-[10px] font-black mt-2 uppercase"><?php echo $item['label']; ?></span>
+                                        </button>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
 
-                            <!-- Trainer and Duration -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div>
-                                    <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Entraîneur *</label>
-                                    <select name="trainer" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold" required>
-                                        <option value="">Sélectionner un entraîneur</option>
-                                        <option value="Ahmed Hassan">Ahmed Hassan</option>
-                                        <option value="Mohamed El Kouri">Mohamed El Kouri</option>
-                                        <option value="Fatima Bennani">Fatima Bennani</option>
-                                        <option value="Sara Alami">Sara Alami</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1 block mb-2">Durée de Session</label>
-                                    <select name="duration" class="w-full px-4 py-3 border border-slate-200 rounded-xl focus:border-indigo-500 outline-none transition font-semibold">
-                                        <option value="30">30 minutes</option>
-                                        <option value="45">45 minutes</option>
-                                        <option value="60">60 minutes (1h)</option>
-                                        <option value="90">90 minutes (1h30)</option>
-                                        <option value="120">120 minutes (2h)</option>
-                                    </select>
+                            <div class="space-y-4">
+                                <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Thème Visuel</label>
+                                <div class="flex gap-4">
+                                    <?php foreach ($colors as $color): ?>
+                                        <button
+                                            type="button"
+                                            onclick="document.getElementById('selectedColor').value='<?php echo $color['id']; ?>'; document.getElementById('previewCard').className = 'bg-gradient-to-br <?php echo $color['class']; ?> p-6 rounded-3xl text-white shadow-lg'"
+                                            class="h-12 w-12 rounded-full border-4 transition-all <?php echo $selectedColor === $color['id'] ? 'border-slate-900 scale-110' : 'border-white shadow-sm'; ?> bg-gradient-to-r <?php echo $color['class']; ?>"
+                                        ></button>
+                                    <?php endforeach; ?>
                                 </div>
                             </div>
 
-                            <!-- Buttons -->
-                            <div class="flex gap-3 pt-6 border-t border-slate-100">
-                                <button 
-                                    type="submit"
-                                    class="flex-1 py-3 bg-indigo-600 text-white font-black rounded-xl hover:bg-indigo-700 transition-all flex items-center justify-center gap-2"
-                                >
-                                    <?php echo checkIcon(18); ?>
-                                    Créer l'Activité
-                                </button>
-                                <a href="index.php?page=sports" class="flex-1 py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition-all text-center">
-                                    Annuler
-                                </a>
+                            <div class="grid grid-cols-2 gap-6 pt-4">
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Prix Mensuel (DH)</label>
+                                    <div class="relative">
+                                        <?php echo icon('credit-card', 18, 'absolute left-4 top-1/2 -translate-y-1/2 text-slate-400'); ?>
+                                        <input 
+                                            type="number"
+                                            name="price"
+                                            id="priceInput"
+                                            class="w-full pl-12 pr-5 py-4 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-2xl outline-none transition-all font-black text-xl text-emerald-600"
+                                            value="<?php echo htmlspecialchars($price); ?>"
+                                            onkeyup="document.getElementById('previewPrice').innerText = this.value + ' DH / Mois';"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <label class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Accès Sauna</label>
+                                    <div class="h-14 bg-indigo-50 rounded-2xl flex items-center justify-between px-6 border border-indigo-100">
+                                        <span class="text-xs font-bold text-indigo-700">Inclus par défaut</span>
+                                        <?php echo icon('check-circle', 20, 'text-indigo-600'); ?>
+                                    </div>
+                                </div>
                             </div>
+
+                            <button type="submit" class="w-full py-4 bg-slate-900 text-white font-black rounded-2xl shadow-xl shadow-slate-200 hover:bg-slate-800 transition-all active:scale-[0.98]">
+                                Créer l'activité
+                            </button>
                         </form>
                     </div>
-                </div>
 
-                <!-- Preview Card -->
-                <div>
-                    <div class="sticky top-8">
-                        <div class="bg-white rounded-2xl border border-slate-100 overflow-hidden">
-                            <div class="h-32 bg-gradient-to-r from-indigo-500 to-blue-600"></div>
-                            <div class="p-6">
-                                <div class="h-16 w-16 rounded-2xl bg-indigo-100 flex items-center justify-center text-indigo-600 text-2xl -mt-12 mb-4 border-4 border-white shadow-lg">
-                                    <?php echo dumbbellIcon(32); ?>
+                    <div class="space-y-6">
+                        <div class="bg-white p-8 rounded-[32px] border border-slate-100 shadow-sm">
+                            <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">Aperçu de la carte</h3>
+                            <div id="previewCard" class="bg-gradient-to-br <?php echo $selectedColorClass; ?> p-6 rounded-3xl text-white shadow-lg">
+                                <div id="previewIcon" class="h-12 w-12 bg-white/20 rounded-xl flex items-center justify-center mb-4">
+                                    <?php echo icon(strtolower($selectedIcon), 24); ?>
                                 </div>
-                                <h3 class="text-lg font-black text-slate-900">Nouvelle Activité</h3>
-                                <p class="text-4xl font-black text-indigo-600 mt-2">500 DH</p>
-                                <p class="text-xs text-slate-500 font-bold mt-4">Par mois • Capacité 20</p>
-                                
-                                <div class="mt-6 pt-6 border-t border-slate-100 space-y-2">
-                                    <div class="flex justify-between text-sm">
-                                        <span class="text-slate-500">Entraîneur</span>
-                                        <span class="font-semibold text-slate-900">À sélectionner</span>
-                                    </div>
-                                    <div class="flex justify-between text-sm">
-                                        <span class="text-slate-500">Durée</span>
-                                        <span class="font-semibold text-slate-900">60 minutes</span>
-                                    </div>
-                                </div>
+                                <h4 id="previewName" class="text-xl font-black"><?php echo htmlspecialchars($name) ?: 'Nom du Sport'; ?></h4>
+                                <p id="previewPrice" class="text-sm font-medium opacity-80 mt-1"><?php echo htmlspecialchars($price); ?> DH / Mois</p>
                             </div>
-                        </div>
-
-                        <div class="mt-6 bg-amber-50 border border-amber-200 rounded-2xl p-4 flex items-start gap-3">
-                            <span class="text-2xl flex-shrink-0">💡</span>
-                            <div>
-                                <p class="font-bold text-amber-900 text-sm">Conseil</p>
-                                <p class="text-xs text-amber-700 mt-1">Commencez avec une activité populaire et ajustez le prix en fonction de la demande.</p>
+                            
+                            <div class="mt-8 flex items-start gap-4 p-4 bg-amber-50 rounded-2xl border border-amber-100">
+                                <?php echo icon('info', 20, 'text-amber-500 shrink-0'); ?>
+                                <p class="text-[11px] font-bold text-amber-700 leading-relaxed">
+                                    Les activités créées sont immédiatement disponibles dans le menu de sélection lors de l'ajout d'un membre.
+                                </p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
-</div>
+        </main>
+    </div>
+    <script>
+        document.getElementById('name').addEventListener('keyup', function() {
+            document.getElementById('previewName').innerText = this.value || 'Nom du Sport';
+        });
+        document.getElementById('priceInput').addEventListener('keyup', function() {
+            document.getElementById('previewPrice').innerText = (this.value || '0') + ' DH / Mois';
+        });
+    </script>
+</body>
+</html>

@@ -3,14 +3,18 @@
  * Header Component
  */
 require_once ROOT_PATH . '/helpers/Icons.php';
+require_once ROOT_PATH . '/components/Notifications.php';
 
 function renderHeader() {
     $currentPage = getParam('page', 'dashboard');
     $user = getCurrentUser();
+    $mockData = include ROOT_PATH . '/config/MockData.php';
+    $notifications = $mockData['notifications'] ?? [];
+    $unreadCount = count(array_filter($notifications, fn($n) => !$n['isRead']));
     ?>
     <header class="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-20">
         <div class="flex-1 max-w-xl relative group">
-            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><?php echo icon('mail', 16); ?></span>
+            <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"><?php echo icon('search', 16); ?></span>
             <input 
                 type="text" 
                 placeholder="Rechercher un membre, un paiement..." 
@@ -21,17 +25,20 @@ function renderHeader() {
         <div class="flex items-center gap-4 ml-8">
             <!-- Notifications -->
             <div class="relative">
-                <button class="relative text-slate-500 hover:text-slate-900 p-2.5 rounded-xl transition-all hover:bg-slate-50">
+                <button id="notifications-button" class="relative text-slate-500 hover:text-slate-900 p-2.5 rounded-xl transition-all hover:bg-slate-50">
                     <?php echo bellIcon(20); ?>
-                    <span class="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white text-[10px] font-black flex items-center justify-center rounded-full border-2 border-white">3</span>
+                    <?php if ($unreadCount > 0): ?>
+                    <span class="absolute top-1 right-1 w-4 h-4 bg-rose-500 text-white text-[10px] font-black flex items-center justify-center rounded-full border-2 border-white"><?php echo $unreadCount; ?></span>
+                    <?php endif; ?>
                 </button>
+                <?php renderNotificationsDropdown(); ?>
             </div>
             
             <div class="h-10 w-px bg-slate-200 mx-2"></div>
             
             <!-- Profile -->
             <div class="relative">
-                <button class="flex items-center gap-3 p-1.5 pr-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50">
+                <button id="profile-button" class="flex items-center gap-3 p-1.5 pr-3 rounded-2xl transition-all border border-transparent hover:bg-slate-50">
                     <div class="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-black shadow-md shadow-indigo-100">
                         <?php echo strtoupper(substr($user['firstName'] ?? 'A', 0, 1) . substr($user['lastName'] ?? 'C', 0, 1)); ?>
                     </div>
@@ -40,6 +47,7 @@ function renderHeader() {
                         <p class="text-[10px] font-bold text-slate-400 mt-1 uppercase tracking-tight">Super Admin</p>
                     </div>
                 </button>
+                <?php renderProfileDropdown(); ?>
             </div>
         </div>
     </header>
@@ -134,5 +142,6 @@ function renderPageLayout($title, $description = '', $content) {
         </div>
     </main>
     <?php
+    renderDropdownScript();
 }
 ?>

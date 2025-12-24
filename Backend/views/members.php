@@ -8,6 +8,7 @@ require_once 'config/Models.php';
 require_once 'controllers/MembersController.php';
 require_once 'components/Components.php';
 require_once 'components/Layout.php';
+require_once 'components/Notifications.php';
 
 requireLogin();
 

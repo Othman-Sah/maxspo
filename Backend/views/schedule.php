@@ -8,6 +8,7 @@ require_once 'config/config.php';
 require_once 'controllers/ScheduleController.php';
 require_once 'components/Layout.php';
 require_once 'helpers/Icons.php';
+require_once 'components/Notifications.php';
 
 requireLogin();
 
@@ -142,5 +143,6 @@ $currentPage = 'schedule';
             </div>
         </main>
     </div>
+    <?php renderDropdownScript(); ?>
 </body>
 </html>

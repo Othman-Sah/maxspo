@@ -8,6 +8,7 @@ require_once 'config/config.php';
 require_once 'controllers/StaffController.php';
 require_once 'components/Layout.php';
 require_once 'helpers/Icons.php';
+require_once 'components/Notifications.php';
 
 requireLogin();
 
@@ -134,5 +135,6 @@ function getStatusBadgeInfo($status) {
             </div>
         </main>
     </div>
+    <?php renderDropdownScript(); ?>
 </body>
 </html>

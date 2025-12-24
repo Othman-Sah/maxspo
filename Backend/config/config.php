@@ -18,7 +18,7 @@ define('VIEWS_PATH', ROOT_PATH . '/views');
 // Database Configuration
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
-define('DB_PASS', 'root');
+define('DB_PASS', '');
 define('DB_NAME', 'needsport_pro');
 define('DB_PORT', 3306);
 
