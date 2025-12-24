@@ -90,6 +90,7 @@ $activities = $dashboardCtrl->getActivities();
             </div>
         </main>
     </div>
+    <?php renderDropdownScript(); ?>
 </body>
 </html>
 <?php

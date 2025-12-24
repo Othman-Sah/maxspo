@@ -69,9 +69,9 @@ function renderNotificationsDropdown() {
 function renderProfileDropdown() {
     $user = getCurrentUser();
     $menuItems = [
-        ['id' => 'settings-profile', 'label' => 'Mon Profil', 'icon' => 'user', 'desc' => 'Infos personnelles'],
-        ['id' => 'settings', 'label' => 'Paramètres', 'icon' => 'settings', 'desc' => 'Configuration du club'],
-        ['id' => 'settings-security', 'label' => 'Sécurité', 'icon' => 'shield', 'desc' => 'Mot de passe & 2FA'],
+        ['id' => 'settings-profile', 'label' => 'Mon Profil', 'icon' => 'user', 'desc' => 'Infos personnelles', 'section' => 'profile'],
+        ['id' => 'settings', 'label' => 'Paramètres', 'icon' => 'settings', 'desc' => 'Configuration du club', 'section' => 'general'],
+        ['id' => 'settings-security', 'label' => 'Sécurité', 'icon' => 'shield', 'desc' => 'Mot de passe & 2FA', 'section' => 'security'],
     ];
     ?>
     <div id="profile-dropdown" class="absolute top-full right-0 mt-4 w-72 bg-white rounded-3xl shadow-2xl border border-slate-100 overflow-hidden z-50 hidden animate-in fade-in slide-in-from-top-2 duration-300">
@@ -89,7 +89,7 @@ function renderProfileDropdown() {
 
         <div class="p-2">
             <?php foreach ($menuItems as $item): ?>
-                <a href="index.php?page=settings" class="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 transition-all group text-left">
+                <a href="index.php?page=settings&section=<?php echo $item['section']; ?>" class="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 transition-all group text-left">
                     <div class="h-10 w-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 group-hover:border-indigo-100 transition-all">
                         <?php echo icon($item['icon'], 20); ?>
                     </div>

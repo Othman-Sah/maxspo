@@ -192,5 +192,6 @@ $averageBasket = $totalPayments > 0 ? round($totalAmount / $totalPayments) : 0;
             </div>
         </main>
     </div>
+    <?php renderDropdownScript(); ?>
 </body>
 </html>

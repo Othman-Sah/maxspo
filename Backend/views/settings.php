@@ -153,5 +153,6 @@ $themeColor = 'indigo';
             </div>
         </main>
     </div>
+    <?php renderDropdownScript(); ?>
 </body>
 </html>

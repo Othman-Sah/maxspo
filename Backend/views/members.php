@@ -173,6 +173,7 @@ $mockData = require 'config/MockData.php';
             </div>
         </main>
     </div>
+    <?php renderDropdownScript(); ?>
 </body>
 </html>
 <?php

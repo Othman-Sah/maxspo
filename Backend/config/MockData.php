@@ -250,6 +250,33 @@ return [
             'time' => 'Il y a 45 min',
             'isRead' => false,
             'priority' => 'medium'
+        ],
+        [
+            'id' => 'n3',
+            'type' => 'system',
+            'title' => 'Maintenance Sauna',
+            'description' => 'Le capteur de température du sauna nécessite une vérification.',
+            'time' => 'Il y a 2h',
+            'isRead' => true,
+            'priority' => 'low'
+        ],
+        [
+            'id' => 'n4',
+            'type' => 'member',
+            'title' => 'Nouvelle Inscription',
+            'description' => 'Meryem Alaoui vient de rejoindre le club (Yoga & Pilates).',
+            'time' => 'Il y a 3h',
+            'isRead' => true,
+            'priority' => 'low'
+        ],
+        [
+            'id' => 'n5',
+            'type' => 'payment',
+            'title' => 'Relance nécessaire',
+            'description' => '5 membres arrivent à expiration demain sans paiement.',
+            'time' => 'Ce matin',
+            'isRead' => false,
+            'priority' => 'high'
         ]
     ]
 ];

@@ -213,5 +213,6 @@ foreach ($colors as $color) {
             document.getElementById('previewPrice').innerText = (this.value || '0') + ' DH / Mois';
         });
     </script>
+    <?php renderDropdownScript(); ?>
 </body>
 </html>
