@@ -1,13 +1,124 @@
 <?php
 require_once 'config/config.php';
-require_once 'controllers/POSController.php';
 require_once 'components/Layout.php';
 require_once 'helpers/Icons.php';
 
 requireLogin();
+global $db;
 
-$controller = new POSController($db);
-$products = $controller->getItems();
+// Create POS tables if not exist
+try {
+    $db->exec("CREATE TABLE IF NOT EXISTS pos_products (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name VARCHAR(100) NOT NULL,
+        category VARCHAR(50),
+        price DECIMAL(10,2) NOT NULL,
+        stock INT DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+    
+    $db->exec("CREATE TABLE IF NOT EXISTS pos_sales (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        total DECIMAL(10,2) NOT NULL,
+        payment_method VARCHAR(50),
+        items_count INT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )");
+    
+    $db->exec("CREATE TABLE IF NOT EXISTS pos_sale_items (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        sale_id INT NOT NULL,
+        product_id INT NOT NULL,
+        product_name VARCHAR(100),
+        quantity INT,
+        unit_price DECIMAL(10,2),
+        subtotal DECIMAL(10,2),
+        FOREIGN KEY (sale_id) REFERENCES pos_sales(id) ON DELETE CASCADE
+    )");
+} catch (Exception $e) {}
+
+// Handle requests
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    header('Content-Type: application/json');
+    
+    if (isset($_POST['action'])) {
+        switch ($_POST['action']) {
+            case 'add_product':
+                $name = sanitize($_POST['name'] ?? '');
+                $category = sanitize($_POST['category'] ?? '');
+                $price = floatval($_POST['price'] ?? 0);
+                $stock = intval($_POST['stock'] ?? 0);
+                
+                $stmt = $db->prepare("INSERT INTO pos_products (name, category, price, stock) VALUES (?, ?, ?, ?)");
+                $stmt->execute([$name, $category, $price, $stock]);
+                echo json_encode(['success' => true, 'id' => $db->lastInsertId()]);
+                exit;
+            
+            case 'update_product':
+                $id = intval($_POST['id']);
+                $name = sanitize($_POST['name'] ?? '');
+                $category = sanitize($_POST['category'] ?? '');
+                $price = floatval($_POST['price'] ?? 0);
+                $stock = intval($_POST['stock'] ?? 0);
+                
+                $stmt = $db->prepare("UPDATE pos_products SET name = ?, category = ?, price = ?, stock = ? WHERE id = ?");
+                $stmt->execute([$name, $category, $price, $stock, $id]);
+                echo json_encode(['success' => true]);
+                exit;
+            
+            case 'delete_product':
+                $id = intval($_POST['id']);
+                $stmt = $db->prepare("DELETE FROM pos_products WHERE id = ?");
+                $stmt->execute([$id]);
+                echo json_encode(['success' => true]);
+                exit;
+            
+            case 'process_sale':
+                $items = $_POST['items'] ?? [];
+                $paymentMethod = sanitize($_POST['payment_method'] ?? 'cash');
+                
+                if (empty($items)) {
+                    echo json_encode(['success' => false, 'message' => 'Panier vide']);
+                    exit;
+                }
+                
+                $total = 0;
+                $itemsCount = 0;
+                
+                foreach ($items as $item) {
+                    $total += floatval($item['price']) * intval($item['quantity']);
+                    $itemsCount += intval($item['quantity']);
+                }
+                
+                $saleStmt = $db->prepare("INSERT INTO pos_sales (total, payment_method, items_count) VALUES (?, ?, ?)");
+                $saleStmt->execute([$total, $paymentMethod, $itemsCount]);
+                $saleId = $db->lastInsertId();
+                
+                foreach ($items as $item) {
+                    $itemStmt = $db->prepare("INSERT INTO pos_sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?, ?)");
+                    $subtotal = floatval($item['price']) * intval($item['quantity']);
+                    $itemStmt->execute([
+                        $saleId,
+                        intval($item['id']),
+                        sanitize($item['name']),
+                        intval($item['quantity']),
+                        floatval($item['price']),
+                        $subtotal
+                    ]);
+                    
+                    $updateStmt = $db->prepare("UPDATE pos_products SET stock = stock - ? WHERE id = ?");
+                    $updateStmt->execute([intval($item['quantity']), intval($item['id'])]);
+                }
+                
+                echo json_encode(['success' => true, 'sale_id' => $saleId, 'total' => $total]);
+                exit;
+        }
+    }
+}
+
+// Get all products
+$stmt = $db->query("SELECT * FROM pos_products ORDER BY category, name");
+$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $currentPage = 'pos';
 
 function getProductEmoji($category) {
@@ -65,7 +176,7 @@ function getProductColorClass($category) {
                                 <?php echo icon('search', 20, 'absolute left-4 top-1/2 -translate-y-1/2 text-slate-400'); ?>
                                 <input type="text" id="search-input" placeholder="Rechercher produit..." class="pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl outline-none focus:border-indigo-500 font-bold text-sm w-full md:w-64 shadow-sm" />
                             </div>
-                            <button class="p-3 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 group" title="Ajouter un nouveau produit">
+                            <button onclick="openAddProductModal()" class="p-3 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 group" title="Ajouter un nouveau produit">
                                 <?php echo icon('plus-circle', 24, 'group-hover:rotate-90 transition-transform duration-300'); ?>
                             </button>
                         </div>
@@ -80,26 +191,36 @@ function getProductColorClass($category) {
 
                     <div id="product-grid" class="flex-1 overflow-y-auto pr-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 animate-in" style="animation-delay: 0.2s;">
                         <?php foreach ($products as $product): ?>
-                            <button
-                                class="product-card bg-white p-5 rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all text-left flex flex-col group active:scale-95"
-                                data-id="<?php echo $product['id']; ?>"
-                                data-name="<?php echo htmlspecialchars($product['name']); ?>"
-                                data-price="<?php echo $product['price']; ?>"
-                                data-category="<?php echo $product['category']; ?>"
-                                data-stock="<?php echo $product['stock']; ?>"
-                            >
-                                <div class="h-32 w-full rounded-2xl mb-4 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform <?php echo getProductColorClass($product['category']); ?>">
-                                    <?php echo getProductEmoji($product['category']); ?>
+                            <div class="group relative">
+                                <button
+                                    class="product-card bg-white p-5 rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all text-left flex flex-col w-full active:scale-95"
+                                    data-id="<?php echo $product['id']; ?>"
+                                    data-name="<?php echo htmlspecialchars($product['name']); ?>"
+                                    data-price="<?php echo $product['price']; ?>"
+                                    data-category="<?php echo $product['category']; ?>"
+                                    data-stock="<?php echo $product['stock']; ?>"
+                                >
+                                    <div class="h-32 w-full rounded-2xl mb-4 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform <?php echo getProductColorClass($product['category']); ?>">
+                                        <?php echo getProductEmoji($product['category']); ?>
+                                    </div>
+                                    <p class="text-[10px] font-black uppercase text-slate-400 mb-1"><?php echo htmlspecialchars($product['category']); ?></p>
+                                    <h3 class="text-sm font-black text-slate-900 flex-1 leading-tight"><?php echo htmlspecialchars($product['name']); ?></h3>
+                                    <div class="mt-4 flex items-center justify-between">
+                                        <span class="text-lg font-black text-slate-900"><?php echo $product['price']; ?> DH</span>
+                                        <span class="text-[10px] font-bold text-slate-400">Stock: <?php echo $product['stock']; ?></span>
+                                    </div>
+                                </button>
+                                <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                                    <button onclick="editProduct(<?php echo $product['id']; ?>, '<?php echo htmlspecialchars($product['name']); ?>', '<?php echo $product['category']; ?>', <?php echo $product['price']; ?>, <?php echo $product['stock']; ?>)" class="p-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
+                                        <?php echo icon('edit-2', 14); ?>
+                                    </button>
+                                    <button onclick="deleteProduct(<?php echo $product['id']; ?>)" class="p-2 bg-rose-500 text-white rounded-lg hover:bg-rose-600">
+                                        <?php echo icon('trash-2', 14); ?>
+                                    </button>
                                 </div>
-                                <p class="text-[10px] font-black uppercase text-slate-400 mb-1"><?php echo htmlspecialchars($product['category']); ?></p>
-                                <h3 class="text-sm font-black text-slate-900 flex-1 leading-tight"><?php echo htmlspecialchars($product['name']); ?></h3>
-                                <div class="mt-4 flex items-center justify-between">
-                                    <span class="text-lg font-black text-slate-900"><?php echo $product['price']; ?> DH</span>
-                                    <span class="text-[10px] font-bold text-slate-400">Stock: <?php echo $product['stock']; ?></span>
-                                </div>
-                            </button>
+                            </div>
                         <?php endforeach; ?>
-                         <button class="p-5 rounded-[28px] border-2 border-dashed border-slate-200 text-slate-300 hover:border-indigo-300 hover:bg-indigo-50/30 transition-all flex flex-col items-center justify-center text-center gap-3 py-12">
+                         <button onclick="openAddProductModal()" class="p-5 rounded-[28px] border-2 border-dashed border-slate-200 text-slate-300 hover:border-indigo-300 hover:bg-indigo-50/30 transition-all flex flex-col items-center justify-center text-center gap-3 py-12">
                             <?php echo icon('plus', 32); ?>
                             <span class="text-xs font-black uppercase tracking-widest">Nouveau Produit</span>
                         </button>
@@ -138,11 +259,11 @@ function getProductColorClass($category) {
                              </div>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
-                             <button class="flex flex-col items-center justify-center p-4 bg-white/10 hover:bg-white/20 rounded-2xl transition-all group">
+                             <button onclick="processPayment('cash')" class="flex flex-col items-center justify-center p-4 bg-white/10 hover:bg-white/20 rounded-2xl transition-all group">
                                 <span class="text-emerald-400 group-hover:scale-110 transition-transform text-2xl mb-1">💵</span>
                                 <span class="text-[10px] font-black uppercase">Espèces</span>
                              </button>
-                             <button class="flex flex-col items-center justify-center p-4 bg-indigo-600 hover:bg-indigo-700 rounded-2xl transition-all shadow-lg shadow-indigo-500/20 group">
+                             <button onclick="processPayment('card')" class="flex flex-col items-center justify-center p-4 bg-indigo-600 hover:bg-indigo-700 rounded-2xl transition-all shadow-lg shadow-indigo-500/20 group">
                                 <span class="text-white group-hover:scale-110 transition-transform text-2xl mb-1">💳</span>
                                 <span class="text-[10px] font-black uppercase">Carte / NFC</span>
                              </button>
@@ -167,6 +288,8 @@ function getProductColorClass($category) {
             const totalItemsEl = document.getElementById('cart-total-items');
             const searchInput = document.getElementById('search-input');
             const categoryFilters = document.getElementById('category-filters');
+
+            window.cart = cart;
 
             function updateCart() {
                 cartItemsContainer.innerHTML = '';
@@ -308,6 +431,206 @@ function getProductColorClass($category) {
 
             updateCart();
         });
+
+        // Product Management Functions
+        function openAddProductModal() {
+            document.getElementById('addProductModal').classList.remove('hidden');
+        }
+        function closeAddProductModal() {
+            document.getElementById('addProductModal').classList.add('hidden');
+            document.getElementById('addProductModal').querySelector('form').reset();
+        }
+        function openEditProductModal() {
+            document.getElementById('editProductModal').classList.remove('hidden');
+        }
+        function closeEditProductModal() {
+            document.getElementById('editProductModal').classList.add('hidden');
+        }
+
+        async function addProduct(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            formData.append('action', 'add_product');
+            
+            try {
+                const response = await fetch('', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.success) {
+                    closeAddProductModal();
+                    location.reload();
+                }
+            } catch (error) {
+                alert('Erreur: ' + error);
+            }
+        }
+
+        function editProduct(id, name, category, price, stock) {
+            document.getElementById('editProductId').value = id;
+            document.getElementById('editProductName').value = name;
+            document.getElementById('editProductCategory').value = category;
+            document.getElementById('editProductPrice').value = price;
+            document.getElementById('editProductStock').value = stock;
+            openEditProductModal();
+        }
+
+        async function saveProductEdit(e) {
+            e.preventDefault();
+            const formData = new FormData();
+            formData.append('action', 'update_product');
+            formData.append('id', document.getElementById('editProductId').value);
+            formData.append('name', document.getElementById('editProductName').value);
+            formData.append('category', document.getElementById('editProductCategory').value);
+            formData.append('price', document.getElementById('editProductPrice').value);
+            formData.append('stock', document.getElementById('editProductStock').value);
+            
+            try {
+                const response = await fetch('', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.success) {
+                    closeEditProductModal();
+                    location.reload();
+                }
+            } catch (error) {
+                alert('Erreur: ' + error);
+            }
+        }
+
+        async function deleteProduct(id) {
+            if (!confirm('Supprimer ce produit?')) return;
+            const formData = new FormData();
+            formData.append('action', 'delete_product');
+            formData.append('id', id);
+            
+            try {
+                const response = await fetch('', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.success) {
+                    location.reload();
+                }
+            } catch (error) {
+                alert('Erreur: ' + error);
+            }
+        }
+
+        // Payment Functions
+        async function processPayment(method) {
+            if (window.cart.length === 0) {
+                alert('Panier vide!');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('action', 'process_sale');
+            formData.append('payment_method', method);
+            
+            window.cart.forEach((item, index) => {
+                formData.append(`items[${index}][id]`, item.id);
+                formData.append(`items[${index}][name]`, item.name);
+                formData.append(`items[${index}][price]`, item.price);
+                formData.append(`items[${index}][quantity]`, item.quantity);
+            });
+            
+            try {
+                const response = await fetch('', { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.success) {
+                    document.getElementById('saleId').textContent = '#' + result.sale_id;
+                    document.getElementById('saleTotal').textContent = result.total;
+                    document.getElementById('paymentModal').classList.remove('hidden');
+                    window.cart.length = 0;
+                    document.getElementById('cart-items-container').innerHTML = '';
+                    document.getElementById('empty-cart-message').style.display = 'flex';
+                    document.getElementById('cart-subtotal').textContent = '0 DH';
+                    document.getElementById('cart-total').textContent = '0';
+                    document.getElementById('cart-total-items').textContent = '0 ARTICLES';
+                }
+            } catch (error) {
+                alert('Erreur: ' + error);
+            }
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+        }
     </script>
+
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4">Nouveau Produit</h2>
+            <form onsubmit="addProduct(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Nom</label>
+                    <input type="text" name="name" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Catégorie</label>
+                    <select name="category" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        <option value="complement">Complément</option>
+                        <option value="snack">Snack</option>
+                        <option value="boisson">Boisson</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Prix (DH)</label>
+                    <input type="number" name="price" step="0.01" min="0" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Stock</label>
+                    <input type="number" name="stock" min="0" value="0" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                </div>
+                <div class="flex gap-2 pt-4">
+                    <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Ajouter</button>
+                    <button type="button" onclick="closeAddProductModal()" class="flex-1 px-4 py-2 bg-slate-200 text-slate-900 font-bold rounded-lg">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Product Modal -->
+    <div id="editProductModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4">Modifier Produit</h2>
+            <form onsubmit="saveProductEdit(event)" class="space-y-4">
+                <input type="hidden" id="editProductId">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Nom</label>
+                    <input type="text" id="editProductName" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Catégorie</label>
+                    <select id="editProductCategory" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                        <option value="complement">Complément</option>
+                        <option value="snack">Snack</option>
+                        <option value="boisson">Boisson</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Prix (DH)</label>
+                    <input type="number" id="editProductPrice" step="0.01" min="0" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Stock</label>
+                    <input type="number" id="editProductStock" min="0" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                </div>
+                <div class="flex gap-2 pt-4">
+                    <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Modifier</button>
+                    <button type="button" onclick="closeEditProductModal()" class="flex-1 px-4 py-2 bg-slate-200 text-slate-900 font-bold rounded-lg">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Success Modal -->
+    <div id="paymentModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center">
+            <div class="text-5xl mb-4">✅</div>
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">Paiement Réussi!</h2>
+            <p class="text-slate-600 mb-4">Numéro de vente: <span id="saleId" class="font-bold text-indigo-600"></span></p>
+            <p class="text-3xl font-black text-emerald-500 mb-6"><span id="saleTotal">0</span> DH</p>
+            <button onclick="closePaymentModal()" class="w-full px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Nouvelle Vente</button>
+        </div>
+    </div>
 </body>
 </html>

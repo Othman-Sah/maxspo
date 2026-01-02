@@ -19,6 +19,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_staff'])) {
     $name = $_POST['name'] ?? '';
     $job = $_POST['job'] ?? '';
     $salary = $_POST['salary'] ?? 0;
+    $picture = '';
+    
+    // Handle file upload
+    if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = 'uploads/staff/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        
+        $filename = uniqid() . '_' . basename($_FILES['picture']['name']);
+        $filepath = $uploadDir . $filename;
+        
+        if (move_uploaded_file($_FILES['picture']['tmp_name'], $filepath)) {
+            $picture = $filepath;
+        }
+    }
     
     if (empty($name) || empty($job)) {
         $error = 'Name and job are required';
@@ -31,11 +47,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_staff'])) {
                 name VARCHAR(100) NOT NULL,
                 job VARCHAR(100) NOT NULL,
                 salary DECIMAL(10, 2) DEFAULT 0,
+                picture VARCHAR(255),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )");
             
-            $stmt = $conn->prepare("INSERT INTO staff (name, job, salary) VALUES (?, ?, ?)");
-            $stmt->execute([$name, $job, $salary]);
+            $stmt = $conn->prepare("INSERT INTO staff (name, job, salary, picture) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$name, $job, $salary, $picture]);
             $success = 'Staff member added successfully!';
             header("Refresh: 1; url=index.php?page=staff");
         } catch (Exception $e) {
@@ -51,13 +68,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_staff'])) {
     $job = $_POST['job'] ?? '';
     $salary = $_POST['salary'] ?? 0;
     
+    // Get current picture
+    try {
+        $conn = $db->getConnection();
+        $stmt = $conn->prepare("SELECT picture FROM staff WHERE id = ?");
+        $stmt->execute([$staffId]);
+        $currentStaff = $stmt->fetch(PDO::FETCH_ASSOC);
+        $picture = $currentStaff['picture'] ?? '';
+    } catch (Exception $e) {
+        $picture = '';
+    }
+    
+    // Handle file upload
+    if (isset($_FILES['picture']) && $_FILES['picture']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = 'uploads/staff/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+        
+        $filename = uniqid() . '_' . basename($_FILES['picture']['name']);
+        $filepath = $uploadDir . $filename;
+        
+        if (move_uploaded_file($_FILES['picture']['tmp_name'], $filepath)) {
+            // Delete old picture if exists
+            if (!empty($picture) && file_exists($picture)) {
+                unlink($picture);
+            }
+            $picture = $filepath;
+        }
+    }
+    
     if (empty($name) || empty($job)) {
         $error = 'Name and job are required';
     } else {
         try {
             $conn = $db->getConnection();
-            $stmt = $conn->prepare("UPDATE staff SET name=?, job=?, salary=? WHERE id=?");
-            $stmt->execute([$name, $job, $salary, $staffId]);
+            $stmt = $conn->prepare("UPDATE staff SET name=?, job=?, salary=?, picture=? WHERE id=?");
+            $stmt->execute([$name, $job, $salary, $picture, $staffId]);
             $success = 'Staff member updated successfully!';
             header("Refresh: 1; url=index.php?page=staff");
         } catch (Exception $e) {
@@ -84,17 +131,16 @@ $staff = [];
 try {
     $conn = $db->getConnection();
     
-    // Migrate: Add job and salary columns if they don't exist
+    // Migrate: Add job, salary, and picture columns if they don't exist
     try {
         $conn->exec("ALTER TABLE staff ADD COLUMN job VARCHAR(100) DEFAULT 'Staff'");
-    } catch (Exception $e) {
-        // Column might already exist
-    }
+    } catch (Exception $e) {}
     try {
         $conn->exec("ALTER TABLE staff ADD COLUMN salary DECIMAL(10, 2) DEFAULT 0");
-    } catch (Exception $e) {
-        // Column might already exist
-    }
+    } catch (Exception $e) {}
+    try {
+        $conn->exec("ALTER TABLE staff ADD COLUMN picture VARCHAR(255)");
+    } catch (Exception $e) {}
     
     $stmt = $conn->query("SELECT * FROM staff ORDER BY id DESC");
     $staff = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -174,9 +220,13 @@ $avatarColors = ['bg-indigo-600', 'bg-blue-600', 'bg-purple-600', 'bg-pink-600',
                                 <div class="px-6 pb-6 -mt-12 relative z-10">
                                     <!-- Avatar Circle -->
                                     <div class="flex justify-center mb-4">
-                                        <div class="<?php echo $avatarColor; ?> h-24 w-24 rounded-2xl flex items-center justify-center text-white text-2xl font-black shadow-lg border-4 border-white">
-                                            <?php echo htmlspecialchars($initials); ?>
-                                        </div>
+                                        <?php if (!empty($member['picture']) && file_exists($member['picture'])): ?>
+                                            <img src="<?php echo htmlspecialchars($member['picture']); ?>" alt="<?php echo htmlspecialchars($member['name']); ?>" class="h-24 w-24 rounded-2xl object-cover shadow-lg border-4 border-white">
+                                        <?php else: ?>
+                                            <div class="<?php echo $avatarColor; ?> h-24 w-24 rounded-2xl flex items-center justify-center text-white text-2xl font-black shadow-lg border-4 border-white">
+                                                <?php echo htmlspecialchars($initials); ?>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                     
                                     <!-- Info -->
@@ -211,10 +261,15 @@ $avatarColors = ['bg-indigo-600', 'bg-blue-600', 'bg-purple-600', 'bg-pink-600',
 
     <!-- Add Modal -->
     <div id="addModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in overflow-y-auto max-h-[90vh]">
             <h2 class="text-2xl font-bold text-slate-900 mb-4">Add Staff Member</h2>
-            <form method="POST" class="space-y-4">
+            <form method="POST" enctype="multipart/form-data" class="space-y-4">
                 <input type="hidden" name="add_staff" value="1">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Picture</label>
+                    <input type="file" name="picture" accept="image/*" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <p class="text-xs text-slate-500 mt-1">JPG, PNG, GIF (max 5MB)</p>
+                </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Name</label>
                     <input type="text" name="name" required placeholder="e.g., John Smith" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
@@ -237,11 +292,16 @@ $avatarColors = ['bg-indigo-600', 'bg-blue-600', 'bg-purple-600', 'bg-pink-600',
 
     <!-- Edit Modal -->
     <div id="editModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 animate-in overflow-y-auto max-h-[90vh]">
             <h2 class="text-2xl font-bold text-slate-900 mb-4">Edit Staff Member</h2>
-            <form method="POST" class="space-y-4">
+            <form method="POST" enctype="multipart/form-data" class="space-y-4">
                 <input type="hidden" name="update_staff" value="1">
                 <input type="hidden" name="staff_id" id="editStaffId">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Picture</label>
+                    <input type="file" name="picture" accept="image/*" class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <p class="text-xs text-slate-500 mt-1">Leave empty to keep current picture</p>
+                </div>
                 <div>
                     <label class="block text-sm font-semibold text-slate-700 mb-2">Name</label>
                     <input type="text" name="name" id="editName" required class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
