@@ -6,6 +6,24 @@ require_once 'helpers/Icons.php';
 requireLogin();
 global $db;
 
+function getProductEmoji($category) {
+    switch ($category) {
+        case 'complement': return '💊';
+        case 'snack': return '🍫';
+        case 'boisson': return '🥤';
+        default: return '📦';
+    }
+}
+
+function getProductColorClass($category) {
+    switch ($category) {
+        case 'complement': return 'bg-indigo-50 text-indigo-500';
+        case 'snack': return 'bg-amber-50 text-amber-500';
+        case 'boisson': return 'bg-emerald-50 text-emerald-500';
+        default: return 'bg-slate-50 text-slate-500';
+    }
+}
+
 // Create POS tables if not exist
 try {
     $db->conn->exec("CREATE TABLE IF NOT EXISTS pos_products (
@@ -35,6 +53,26 @@ try {
         subtotal DECIMAL(10,2),
         FOREIGN KEY (sale_id) REFERENCES pos_sales(id) ON DELETE CASCADE
     )");
+    
+    // Seed initial products if table is empty
+    $checkStmt = $db->conn->query("SELECT COUNT(*) FROM pos_products");
+    $count = $checkStmt->fetchColumn();
+    if ($count == 0) {
+        $sampleProducts = [
+            ['Whey Protein', 'complement', 250, 15],
+            ['Creatine', 'complement', 180, 20],
+            ['BCAA', 'complement', 220, 18],
+            ['Snickers', 'snack', 25, 30],
+            ['Proteines Bar', 'snack', 45, 25],
+            ['Coca Cola', 'boisson', 15, 50],
+            ['Energy Drink', 'boisson', 35, 40],
+            ['Water Bottle', 'boisson', 10, 100],
+        ];
+        foreach ($sampleProducts as [$name, $category, $price, $stock]) {
+            $stmt = $db->conn->prepare("INSERT INTO pos_products (name, category, price, stock) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$name, $category, $price, $stock]);
+        }
+    }
 } catch (Exception $e) {}
 
 // Handle requests
@@ -111,6 +149,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 
                 echo json_encode(['success' => true, 'sale_id' => $saleId, 'total' => $total]);
+                exit;
+            
+            default:
+                echo json_encode(['success' => false, 'message' => 'Unknown action']);
                 exit;
         }
     }
@@ -455,13 +497,18 @@ function getProductColorClass($category) {
             
             try {
                 const response = await fetch('', { method: 'POST', body: formData });
-                const result = await response.json();
+                const text = await response.text();
+                console.log('Response:', text);
+                const result = JSON.parse(text);
                 if (result.success) {
                     closeAddProductModal();
                     location.reload();
+                } else {
+                    alert('Erreur: ' + (result.message || 'Unknown error'));
                 }
             } catch (error) {
-                alert('Erreur: ' + error);
+                console.error('Error:', error);
+                alert('Erreur: ' + error.message);
             }
         }
 
