@@ -2,8 +2,23 @@
 require_once ROOT_PATH . '/helpers/Icons.php';
 
 function renderNotificationsDropdown() {
-    $mockData = include ROOT_PATH . '/config/MockData.php';
-    $notifications = $mockData['notifications'] ?? [];
+    // Get notifications from database
+    try {
+        global $db;
+        if ($db) {
+            $conn = $db->getConnection();
+            $stmt = $conn->query("SELECT id, type, title, description, created_at as time, is_read as isRead, priority FROM notifications ORDER BY created_at DESC LIMIT 10");
+            $notifications = $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
+            foreach ($notifications as &$n) {
+                $n['isRead'] = (bool)$n['isRead'];
+            }
+        } else {
+            $notifications = [];
+        }
+    } catch (Exception $e) {
+        $notifications = [];
+    }
+    
     $unreadCount = count(array_filter($notifications, fn($n) => !$n['isRead']));
 
     $getIcon = function($type) {

@@ -5,21 +5,65 @@
 
 require_once 'config/config.php';
 require_once 'config/Models.php';
-require_once 'controllers/MembersController.php';
 require_once 'components/Components.php';
 require_once 'components/Layout.php';
 require_once 'components/Notifications.php';
 
 requireLogin();
 
-$membersCtrl = new MembersController($db);
+// Ensure we have database access
+global $db;
+
+// Get filters
 $filters = [
     'sport' => getParam('sport', 'all'),
     'status' => getParam('status', 'all'),
     'search' => getParam('search', '')
 ];
-$members = $membersCtrl->getAll($filters);
-$mockData = require 'config/MockData.php';
+
+// Inline MembersController logic - Get all members with filters
+try {
+    $conn = $db->getConnection();
+    $sql = "SELECT id, firstName, lastName, email, phone, age, sport, status, expiryDate, joinDate, isLoyal FROM members ORDER BY id DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->execute();
+    $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    foreach ($members as &$m) {
+        $m['isLoyal'] = (bool)$m['isLoyal'];
+        $m['age'] = (int)$m['age'];
+    }
+    
+    // Apply filters
+    if (!empty($filters['sport']) && $filters['sport'] !== 'all') {
+        $members = array_filter($members, fn($m) => $m['sport'] === $filters['sport']);
+    }
+
+    if (!empty($filters['status']) && $filters['status'] !== 'all') {
+        $members = array_filter($members, fn($m) => getMemberStatus($m['expiryDate']) === $filters['status']);
+    }
+
+    if (!empty($filters['search'])) {
+        $search = strtolower($filters['search']);
+        $members = array_filter($members, fn($m) => 
+            stripos($m['firstName'] . ' ' . $m['lastName'], $search) !== false ||
+            stripos($m['email'], $search) !== false ||
+            stripos($m['phone'], $search) !== false
+        );
+    }
+    
+} catch (Exception $e) {
+    error_log("Members fetch error: " . $e->getMessage());
+    $members = [];
+}
+
+// Load activities from database
+try {
+    $activitiesStmt = $db->getConnection()->query("SELECT id, name FROM activities");
+    $activities = $activitiesStmt ? $activitiesStmt->fetchAll(PDO::FETCH_ASSOC) : [];
+} catch (Exception $e) {
+    $activities = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -91,7 +135,7 @@ $mockData = require 'config/MockData.php';
                         <select class="px-4 py-2.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-xl outline-none transition-all text-sm font-medium text-slate-600"
                                 onchange="document.location='index.php?page=members&sport=' + this.value">
                             <option value="all">Tous les sports</option>
-                            <?php foreach ($mockData['activities'] as $activity): ?>
+                            <?php foreach ($activities as $activity): ?>
                                 <option value="<?php echo htmlspecialchars($activity['name']); ?>" <?php echo $filters['sport'] === $activity['name'] ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($activity['name']); ?>
                                 </option>

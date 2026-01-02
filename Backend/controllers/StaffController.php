@@ -6,32 +6,36 @@
 
 class StaffController {
     private $db;
-    private $mockData;
 
     public function __construct($database) {
         $this->db = $database;
-        $this->mockData = require CONFIG_PATH . '/MockData.php';
     }
 
     /**
      * Get all staff members
      */
     public function getAll() {
-        // Using mock data for now
-        return $this->mockData['staff'];
+        try {
+            $conn = $this->db->getConnection();
+            $stmt = $conn->query("SELECT id, name, role, status, phone, email, salary, joinDate FROM staff ORDER BY id DESC");
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
     }
 
     /**
      * Get single staff member by ID
      */
     public function getById($id) {
-        $staff = $this->mockData['staff'];
-        foreach ($staff as $member) {
-            if ($member['id'] === $id) {
-                return $member;
-            }
+        try {
+            $conn = $this->db->getConnection();
+            $stmt = $conn->prepare("SELECT id, name, role, status, phone, email, salary, joinDate FROM staff WHERE id = ?");
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return null;
         }
-        return null;
     }
 
     /**

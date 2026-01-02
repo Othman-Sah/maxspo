@@ -59,7 +59,7 @@ import FinancialsView from './components/FinancialsView';
 import StaffView from './components/StaffView';
 import POSView from './components/POSView';
 import LoginView from './components/LoginView';
-import { MOCK_STATS, MOCK_EXPIRING_MEMBERS, MOCK_SPORTS, MOCK_REVENUE, MOCK_NOTIFICATIONS, MOCK_MEMBERS, MOCK_ACTIVITIES } from './constants';
+import { MOCK_STATS, MOCK_SPORTS, MOCK_REVENUE, MOCK_NOTIFICATIONS, MOCK_ACTIVITIES } from './constants';
 import { Member, StaffMember, Expense } from './types';
 
 const App: React.FC = () => {
@@ -68,6 +68,7 @@ const App: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [expiringMembers, setExpiringMembers] = useState<Member[]>([]);
   
   // Modal States
   const [modalConfig, setModalConfig] = useState<{
@@ -96,6 +97,26 @@ const App: React.FC = () => {
   
   const notifRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
+
+  // Fetch expiring members on mount
+  useEffect(() => {
+    const fetchExpiringMembers = async () => {
+      try {
+        const response = await fetch('http://localhost/lA/Backend/api/members.php');
+        if (response.ok) {
+          const data = await response.json();
+          const members = Array.isArray(data) ? data : [];
+          const expiring = members.filter((m: Member) => m.status === 'expirant' || m.status === 'expire');
+          setExpiringMembers(expiring);
+        }
+      } catch (err) {
+        console.error('Error fetching expiring members:', err);
+        setExpiringMembers([]);
+      }
+    };
+    
+    fetchExpiringMembers();
+  }, []);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -664,7 +685,7 @@ const App: React.FC = () => {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {MOCK_EXPIRING_MEMBERS.map((member) => (
+                      {expiringMembers.map((member) => (
                         <MemberRow 
                           key={member.id} 
                           member={member} 

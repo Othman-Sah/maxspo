@@ -6,11 +6,10 @@
 
 class ScheduleController {
     private $db;
-    private $mockData;
 
     public function __construct($database) {
         $this->db = $database;
-        // In a real app, you'd query the DB. For now, we use a local mock structure.
+        // Uses database queries for schedule data
     }
 
     /**

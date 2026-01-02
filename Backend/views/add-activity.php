@@ -30,6 +30,7 @@ $name = $_POST['name'] ?? '';
 $selectedIcon = $_POST['selectedIcon'] ?? 'Dumbbell';
 $selectedColor = $_POST['selectedColor'] ?? 'indigo';
 $price = $_POST['price'] ?? '250';
+$description = $_POST['description'] ?? '';
 
 $success = null;
 $error = null;
@@ -39,9 +40,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($name) || empty($price)) {
         $error = "Veuillez remplir tous les champs obligatoires.";
     } else {
-        // Here you would typically insert into the database
-        // For now, just show a success message
-        $success = "L'activité '{$name}' a été créée avec succès !";
+        // Save to database
+        try {
+            $conn = $db->getConnection();
+            $stmt = $conn->prepare("INSERT INTO activities (name, description, monthlyPrice, color, icon) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$name, $description, $price, $selectedColor, $selectedIcon]);
+            
+            $success = "L'activité '{$name}' a été créée avec succès !";
+            // Reset form
+            $name = '';
+            $selectedIcon = 'Dumbbell';
+            $selectedColor = 'indigo';
+            $price = '250';
+            $description = '';
+        } catch (Exception $e) {
+            $error = "Erreur lors de la création de l'activité: " . $e->getMessage();
+        }
     }
 }
 

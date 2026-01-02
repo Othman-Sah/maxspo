@@ -6,11 +6,9 @@
 
 class POSController {
     private $db;
-    private $mockData;
 
     public function __construct($database) {
         $this->db = $database;
-        $this->mockData = require CONFIG_PATH . '/MockData.php';
     }
 
     /**

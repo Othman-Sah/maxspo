@@ -6,41 +6,89 @@
 
 class FinancialsController {
     private $db;
-    private $mockData;
 
     public function __construct($database) {
         $this->db = $database;
-        $this->mockData = require CONFIG_PATH . '/MockData.php';
     }
 
     /**
      * Get revenue data for the chart
      */
     public function getRevenueData() {
-        return $this->mockData['revenue'] ?? [];
+        try {
+            $conn = $this->db->getConnection();
+            $data = [];
+            
+            // Get last 6 months of data
+            for ($i = 5; $i >= 0; $i--) {
+                $month = date('Y-m', strtotime("-$i months"));
+                $monthName = date('M', strtotime($month));
+                
+                // Get revenues for the month
+                $stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE DATE_FORMAT(date, '%Y-%m') = ? AND status = 'valide'");
+                $stmt->execute([$month]);
+                $revenue = (int)$stmt->fetchColumn();
+                
+                // Get expenses for the month
+                $stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM expenses WHERE DATE_FORMAT(date, '%Y-%m') = ?");
+                $stmt->execute([$month]);
+                $expenses = (int)$stmt->fetchColumn();
+                
+                $data[] = [
+                    'month' => $monthName,
+                    'amount' => $revenue,
+                    'expenses' => $expenses
+                ];
+            }
+            
+            return $data;
+        } catch (Exception $e) {
+            return [];
+        }
     }
     
     /**
      * Get recent expenses
      */
     public function getExpenses() {
-        return $this->mockData['expenses'] ?? [];
+        try {
+            $conn = $this->db->getConnection();
+            $stmt = $conn->query("SELECT id, category, description, amount, date, status FROM expenses ORDER BY date DESC LIMIT 50");
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
     }
 
     /**
      * Get financial summary stats
      */
     public function getSummary() {
-        $revenue = $this->getRevenueData();
-        $totalEarnings = array_reduce($revenue, fn($sum, $item) => $sum + $item['amount'], 0);
-        $totalExpenses = array_reduce($revenue, fn($sum, $item) => $sum + $item['expenses'], 0);
-        $netProfit = $totalEarnings - $totalExpenses;
+        try {
+            $conn = $this->db->getConnection();
+            
+            // Total revenue from payments
+            $stmt = $conn->query("SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE status = 'valide'");
+            $totalEarnings = (int)$stmt->fetchColumn();
+            
+            // Total expenses
+            $stmt = $conn->query("SELECT COALESCE(SUM(amount), 0) as total FROM expenses");
+            $totalExpenses = (int)$stmt->fetchColumn();
+            
+            $netProfit = $totalEarnings - $totalExpenses;
 
-        return [
-            'totalEarnings' => $totalEarnings,
-            'totalExpenses' => $totalExpenses,
-            'netProfit' => $netProfit,
-        ];
+            return [
+                'totalEarnings' => $totalEarnings,
+                'totalExpenses' => $totalExpenses,
+                'netProfit' => $netProfit,
+            ];
+        } catch (Exception $e) {
+            return [
+                'totalEarnings' => 0,
+                'totalExpenses' => 0,
+                'netProfit' => 0,
+            ];
+        }
     }
 }
 ?>

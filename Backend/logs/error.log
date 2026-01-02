@@ -35,3 +35,87 @@ Stack trace:
 [02-Jan-2026 11:45:48 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
 [02-Jan-2026 11:45:52 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
 [02-Jan-2026 11:45:54 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:04:00 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:04:01 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:06:47 Africa/Casablanca] PHP Fatal error:  Uncaught Error: Call to undefined method Database::connect() in C:\MAMP\htdocs\lA\Backend\config\config.php:60
+Stack trace:
+#0 C:\MAMP\htdocs\lA\Backend\index.php(7): require_once()
+#1 {main}
+  thrown in C:\MAMP\htdocs\lA\Backend\config\config.php on line 60
+[02-Jan-2026 12:06:57 Africa/Casablanca] PHP Fatal error:  Uncaught Error: Call to undefined method Database::connect() in C:\MAMP\htdocs\lA\Backend\config\config.php:60
+Stack trace:
+#0 C:\MAMP\htdocs\lA\Backend\index.php(7): require_once()
+#1 {main}
+  thrown in C:\MAMP\htdocs\lA\Backend\config\config.php on line 60
+[02-Jan-2026 12:09:01 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:09:06 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:09:09 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:09:17 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:09:20 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:09:21 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:11:35 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:11:37 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:11:43 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:11:45 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:11:48 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:12:41 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:15:10 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:15:11 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:15:20 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:15:23 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:16:02 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:19:43 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:19:45 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:19:52 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:24:09 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:24:16 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:28:36 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:28:36 Africa/Casablanca] PHP Warning:  Undefined array key "stats" in C:\MAMP\htdocs\lA\Backend\controllers\DashboardController.php on line 18
+[02-Jan-2026 12:28:36 Africa/Casablanca] PHP Warning:  foreach() argument must be of type array|object, null given in C:\MAMP\htdocs\lA\Backend\config\Models.php on line 189
+[02-Jan-2026 12:28:36 Africa/Casablanca] PHP Warning:  Undefined array key "activities" in C:\MAMP\htdocs\lA\Backend\controllers\DashboardController.php on line 54
+[02-Jan-2026 12:28:36 Africa/Casablanca] PHP Deprecated:  abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in C:\MAMP\htdocs\lA\Backend\components\Components.php on line 24
+[02-Jan-2026 12:28:36 Africa/Casablanca] PHP Deprecated:  number_format(): Passing null to parameter #1 ($num) of type float is deprecated in C:\MAMP\htdocs\lA\Backend\views\dashboard.php on line 61
+[02-Jan-2026 12:28:36 Africa/Casablanca] PHP Deprecated:  abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in C:\MAMP\htdocs\lA\Backend\components\Components.php on line 24
+[02-Jan-2026 12:28:36 Africa/Casablanca] PHP Warning:  foreach() argument must be of type array|object, null given in C:\MAMP\htdocs\lA\Backend\views\dashboard.php on line 88
+[02-Jan-2026 12:30:33 Africa/Casablanca] PHP Fatal error:  Uncaught Error: Call to a member function exec() on null in C:\MAMP\htdocs\lA\Backend\install\seed.php:72
+Stack trace:
+#0 {main}
+  thrown in C:\MAMP\htdocs\lA\Backend\install\seed.php on line 72
+[02-Jan-2026 12:33:33 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:33:33 Africa/Casablanca] PHP Deprecated:  abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in C:\MAMP\htdocs\lA\Backend\components\Components.php on line 24
+[02-Jan-2026 12:33:33 Africa/Casablanca] PHP Deprecated:  abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in C:\MAMP\htdocs\lA\Backend\components\Components.php on line 24
+[02-Jan-2026 12:33:35 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:33:35 Africa/Casablanca] PHP Deprecated:  abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in C:\MAMP\htdocs\lA\Backend\components\Components.php on line 24
+[02-Jan-2026 12:33:35 Africa/Casablanca] PHP Deprecated:  abs(): Passing null to parameter #1 ($num) of type int|float is deprecated in C:\MAMP\htdocs\lA\Backend\components\Components.php on line 24
+[02-Jan-2026 12:37:26 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:37:29 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:37:31 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:37:39 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:37:41 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:37:54 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:37:55 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 12:49:25 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 13:18:57 Africa/Casablanca] PHP Warning:  include(C:\MAMP\htdocs\lA\Backend/config/MockData.php): Failed to open stream: No such file or directory in C:\MAMP\htdocs\lA\Backend\components\Notifications.php on line 5
+[02-Jan-2026 13:18:57 Africa/Casablanca] PHP Warning:  include(): Failed opening 'C:\MAMP\htdocs\lA\Backend/config/MockData.php' for inclusion (include_path='.;C:\php\pear') in C:\MAMP\htdocs\lA\Backend\components\Notifications.php on line 5
+[02-Jan-2026 13:37:18 Africa/Casablanca] PHP Warning:  require_once(../controllers/MembersController.php): Failed to open stream: No such file or directory in C:\MAMP\htdocs\lA\Backend\api\members.php on line 3
+[02-Jan-2026 13:37:18 Africa/Casablanca] PHP Fatal error:  Uncaught Error: Failed opening required '../controllers/MembersController.php' (include_path='.;C:\php\pear') in C:\MAMP\htdocs\lA\Backend\api\members.php:3
+Stack trace:
+#0 {main}
+  thrown in C:\MAMP\htdocs\lA\Backend\api\members.php on line 3
+[02-Jan-2026 16:09:41 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\Backend\views\dashboard.php on line 93
+[02-Jan-2026 16:09:41 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\Backend\views\dashboard.php on line 96
+[02-Jan-2026 16:09:41 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\Backend\views\dashboard.php on line 93
+[02-Jan-2026 16:09:41 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\Backend\views\dashboard.php on line 96
+[02-Jan-2026 16:09:41 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\Backend\views\dashboard.php on line 93
+[02-Jan-2026 16:09:41 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\Backend\views\dashboard.php on line 96
+[02-Jan-2026 16:09:41 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\Backend\views\dashboard.php on line 93
+[02-Jan-2026 16:09:41 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\Backend\views\dashboard.php on line 96
+[02-Jan-2026 16:09:41 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\Backend\views\dashboard.php on line 93
+[02-Jan-2026 16:09:41 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\Backend\views\dashboard.php on line 96
+[02-Jan-2026 17:31:39 Africa/Casablanca] PHP Parse error:  syntax error, unexpected token "endforeach", expecting end of file in C:\MAMP\htdocs\lA\Backend\views\staff.php on line 332
+[02-Jan-2026 17:33:35 Africa/Casablanca] PHP Warning:  Undefined array key "job" in C:\MAMP\htdocs\lA\Backend\views\staff.php on line 162
+[02-Jan-2026 17:33:35 Africa/Casablanca] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\lA\Backend\views\staff.php on line 162
+[02-Jan-2026 17:33:35 Africa/Casablanca] PHP Warning:  Undefined array key "job" in C:\MAMP\htdocs\lA\Backend\views\staff.php on line 162
+[02-Jan-2026 17:33:35 Africa/Casablanca] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\lA\Backend\views\staff.php on line 162
+[02-Jan-2026 17:33:35 Africa/Casablanca] PHP Warning:  Undefined array key "job" in C:\MAMP\htdocs\lA\Backend\views\staff.php on line 162
+[02-Jan-2026 17:33:35 Africa/Casablanca] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\lA\Backend\views\staff.php on line 162

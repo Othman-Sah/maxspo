@@ -16,7 +16,7 @@ define('API_PATH', ROOT_PATH . '/api');
 define('VIEWS_PATH', ROOT_PATH . '/views');
 
 // Database Configuration
-define('DB_HOST', 'localhost');
+define('DB_HOST', '127.0.0.1');
 define('DB_USER', 'root');
 define('DB_PASS', 'root');
 define('DB_NAME', 'needsport_pro');
@@ -42,7 +42,7 @@ define('UPLOAD_DIR', ROOT_PATH . '/public/uploads');
 
 // Error reporting
 error_reporting(E_ALL);
-ini_set('display_errors', 0);
+ini_set('display_errors', 1);
 ini_set('log_errors', 1);
 ini_set('error_log', ROOT_PATH . '/logs/error.log');
 
@@ -53,11 +53,13 @@ date_default_timezone_set(APP_TIMEZONE);
 require_once CONFIG_PATH . '/Database.php';
 require_once HELPERS_PATH . '/functions.php';
 require_once HELPERS_PATH . '/Validator.php';
+require_once CONFIG_PATH . '/Models.php';
 
 // Initialize Database
+global $db;
 try {
     $db = new Database();
-    $db->connect();
+    $db->getConnection();
 } catch (Exception $e) {
     die('Database connection failed: ' . $e->getMessage());
 }

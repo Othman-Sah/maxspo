@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   Search, 
@@ -16,7 +16,6 @@ import {
   FileText
 } from 'lucide-react';
 import { Member } from '../types';
-import { MOCK_MEMBERS } from '../constants';
 
 interface MembersViewProps {
   onAddMember: () => void;
@@ -40,8 +39,35 @@ const MembersView: React.FC<MembersViewProps> = ({
   const [searchQuery, setSearchQuery] = useState('');
   const [sportFilter, setSportFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [members, setMembers] = useState<Member[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const filteredMembers = MOCK_MEMBERS.filter(member => {
+  // Fetch members from API
+  useEffect(() => {
+    const fetchMembers = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch('http://localhost/lA/Backend/api/members.php');
+        if (!response.ok) {
+          throw new Error('Failed to fetch members');
+        }
+        const data = await response.json();
+        setMembers(Array.isArray(data) ? data : []);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching members:', err);
+        setError('Erreur lors du chargement des données');
+        setMembers([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMembers();
+  }, []);
+
+  const filteredMembers = members.filter(member => {
     const matchesSearch = `${member.firstName} ${member.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          member.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          member.phone.includes(searchQuery);
@@ -264,18 +290,36 @@ const MembersView: React.FC<MembersViewProps> = ({
             </tbody>
           </table>
           
-          {filteredMembers.length === 0 && (
+          {filteredMembers.length === 0 && !loading && (
             <div className="py-20 text-center">
               <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
                 <Search size={32} />
               </div>
-              <p className="text-slate-500 font-bold">Aucun membre ne correspond à votre recherche.</p>
-              <button 
-                onClick={() => {setSearchQuery(''); setSportFilter('all'); setStatusFilter('all');}}
-                className="mt-2 text-indigo-600 font-bold text-sm hover:underline"
-              >
-                Effacer les filtres
-              </button>
+              {error ? (
+                <>
+                  <p className="text-slate-500 font-bold">{error}</p>
+                  <p className="text-xs text-slate-400 mt-2">Assurez-vous que le serveur est actif et accessible.</p>
+                </>
+              ) : (
+                <>
+                  <p className="text-slate-500 font-bold">Aucun membre ne correspond à votre recherche.</p>
+                  <button 
+                    onClick={() => {setSearchQuery(''); setSportFilter('all'); setStatusFilter('all');}}
+                    className="mt-2 text-indigo-600 font-bold text-sm hover:underline"
+                  >
+                    Effacer les filtres
+                  </button>
+                </>
+              )}
+            </div>
+          )}
+          
+          {loading && (
+            <div className="py-20 text-center">
+              <div className="inline-block">
+                <div className="w-8 h-8 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin"></div>
+              </div>
+              <p className="text-slate-500 font-bold mt-4">Chargement des membres...</p>
             </div>
           )}
         </div>

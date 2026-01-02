@@ -6,30 +6,42 @@
 
 class PaymentsController {
     private $db;
-    private $mockData;
 
     public function __construct($database) {
         $this->db = $database;
-        $this->mockData = require CONFIG_PATH . '/MockData.php';
     }
 
     /**
      * Get all payments with filtering
      */
     public function getPayments($filters = []) {
-        $payments = $this->mockData['payments'] ?? [];
-
-        if (!empty($filters['method']) && $filters['method'] !== 'all') {
-            $payments = array_filter($payments, fn($p) => $p['method'] === $filters['method']);
+        try {
+            $conn = $this->db->getConnection();
+            $sql = "SELECT p.id, p.member_id as memberId, CONCAT(m.firstName, ' ', m.lastName) as memberName, p.sport, p.amount, p.date, p.method, p.status FROM payments p LEFT JOIN members m ON p.member_id = m.id WHERE 1=1";
+            
+            if (!empty($filters['method']) && $filters['method'] !== 'all') {
+                $sql .= " AND p.method = ?";
+            }
+            if (!empty($filters['status']) && $filters['status'] !== 'all') {
+                $sql .= " AND p.status = ?";
+            }
+            if (!empty($filters['month'])) {
+                $sql .= " AND DATE_FORMAT(p.date, '%Y-%m') = ?";
+            }
+            
+            $sql .= " ORDER BY p.date DESC";
+            $stmt = $conn->prepare($sql);
+            
+            $params = [];
+            if (!empty($filters['method']) && $filters['method'] !== 'all') $params[] = $filters['method'];
+            if (!empty($filters['status']) && $filters['status'] !== 'all') $params[] = $filters['status'];
+            if (!empty($filters['month'])) $params[] = $filters['month'];
+            
+            $stmt->execute($params);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
         }
-        if (!empty($filters['status']) && $filters['status'] !== 'all') {
-            $payments = array_filter($payments, fn($p) => $p['status'] === $filters['status']);
-        }
-        if (!empty($filters['month'])) {
-            $payments = array_filter($payments, fn($p) => strpos($p['date'], $filters['month']) === 0);
-        }
-
-        return $payments;
     }
 
     /**

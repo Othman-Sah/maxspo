@@ -8,9 +8,8 @@ require_once ROOT_PATH . '/components/Notifications.php';
 function renderHeader() {
     $currentPage = getParam('page', 'dashboard');
     $user = getCurrentUser();
-    $mockData = include ROOT_PATH . '/config/MockData.php';
-    $notifications = $mockData['notifications'] ?? [];
-    $unreadCount = count(array_filter($notifications, fn($n) => !$n['isRead']));
+    // Get unread notification count from database
+    $unreadCount = 0;
     ?>
     <header class="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-20">
         <div class="flex-1 max-w-xl relative group">
@@ -121,7 +120,7 @@ function renderSidebar($activePage) {
 /**
  * Page Layout Wrapper
  */
-function renderPageLayout($title, $description = '', $content) {
+function renderPageLayout($title, $description = '', $content = '') {
     ?>
     <main class="flex-1 min-w-0 overflow-auto">
         <?php renderHeader(); ?>

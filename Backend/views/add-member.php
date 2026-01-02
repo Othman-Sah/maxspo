@@ -11,23 +11,48 @@ require_once 'components/Layout.php';
 
 requireLogin();
 
-$dashboardCtrl = new DashboardController();
+global $db;
+$dashboardCtrl = new DashboardController($db);
 $activities = $dashboardCtrl->getActivities();
 $error = '';
 $success = '';
 
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $validator = new Validator();
+    $firstName = $_POST['firstName'] ?? '';
+    $lastName = $_POST['lastName'] ?? '';
+    $email = $_POST['email'] ?? '';
+    $phone = $_POST['phone'] ?? '';
+    $age = $_POST['age'] ?? 0;
+    $sport = $_POST['sport'] ?? '';
     
-    if (!$validator->validateRequired('firstName', postParam('firstName'))) {
+    // Validation
+    if (empty($firstName)) {
         $error = 'Prénom requis';
-    } elseif (!$validator->validateRequired('lastName', postParam('lastName'))) {
+    } elseif (empty($lastName)) {
         $error = 'Nom requis';
-    } elseif (!$validator->validateEmail(postParam('email'))) {
+    } elseif (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $error = 'Email invalide';
+    } elseif (empty($phone)) {
+        $error = 'Téléphone requis';
+    } elseif (empty($sport)) {
+        $error = 'Activité requise';
     } else {
-        $success = 'Membre ajouté avec succès!';
+        // Save to database
+        try {
+            $conn = $db->getConnection();
+            $joinDate = date('Y-m-d');
+            $expiryDate = date('Y-m-d', strtotime('+1 year'));
+            
+            $stmt = $conn->prepare("INSERT INTO members (firstName, lastName, email, phone, age, sport, joinDate, expiryDate, status, isLoyal) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$firstName, $lastName, $email, $phone, $age, $sport, $joinDate, $expiryDate, 'actif', 0]);
+            
+            $success = 'Membre ajouté avec succès!';
+            // Reset form
+            $_POST = [];
+        } catch (Exception $e) {
+            $error = "Erreur lors de l'ajout du membre: " . $e->getMessage();
+        }
     }
 }
 ?>

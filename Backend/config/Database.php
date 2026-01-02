@@ -1,60 +1,29 @@
 <?php
-/**
- * Database Connection Class
- * Handles all database operations using MySQLi
- */
-
 class Database {
-    private $connection;
-    private $host = DB_HOST;
-    private $user = DB_USER;
-    private $pass = DB_PASS;
-    private $db = DB_NAME;
-    private $port = DB_PORT;
+    private $host;
+    private $db_name;
+    private $username;
+    private $password;
 
-    public function connect() {
-        $this->connection = new mysqli($this->host, $this->user, $this->pass, $this->db, $this->port);
+    public $conn;
 
-        if ($this->connection->connect_error) {
-            throw new Exception('Database connection failed: ' . $this->connection->connect_error);
-        }
-
-        $this->connection->set_charset('utf8mb4');
-        return $this->connection;
+    public function __construct() {
+        $this->host = defined('DB_HOST') ? DB_HOST : "localhost";
+        $this->db_name = defined('DB_NAME') ? DB_NAME : "needsport_pro";
+        $this->username = defined('DB_USER') ? DB_USER : "root";
+        $this->password = defined('DB_PASS') ? DB_PASS : "root";
     }
 
     public function getConnection() {
-        return $this->connection;
-    }
-
-    public function query($sql) {
-        $result = $this->connection->query($sql);
-        if (!$result) {
-            throw new Exception('Query failed: ' . $this->connection->error);
+        $this->conn = null;
+        try {
+            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name . ";port=" . (defined('DB_PORT') ? DB_PORT : 3306), $this->username, $this->password);
+            $this->conn->exec("set names utf8");
+            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        } catch(PDOException $exception) {
+            die("Database Connection Error: " . $exception->getMessage());
         }
-        return $result;
-    }
-
-    public function prepare($sql) {
-        return $this->connection->prepare($sql);
-    }
-
-    public function lastInsertId() {
-        return $this->connection->insert_id;
-    }
-
-    public function affectedRows() {
-        return $this->connection->affected_rows;
-    }
-
-    public function escape($value) {
-        return $this->connection->real_escape_string($value);
-    }
-
-    public function close() {
-        if ($this->connection) {
-            $this->connection->close();
-        }
+        return $this->conn;
     }
 }
 ?>

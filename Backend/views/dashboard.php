@@ -12,9 +12,46 @@ require_once 'components/Notifications.php';
 
 requireLogin();
 
-$dashboardCtrl = new DashboardController();
+global $db;
+$dashboardCtrl = new DashboardController($db);
 $stats = $dashboardCtrl->getStats();
 $activities = $dashboardCtrl->getActivities();
+
+// Add member count to each activity
+try {
+    $conn = $db->getConnection();
+    foreach ($activities as &$activity) {
+        $stmt = $conn->prepare("SELECT COUNT(*) as count FROM members WHERE sport = ?");
+        $stmt->execute([$activity['name']]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $activity['memberCount'] = $result['count'] ?? 0;
+    }
+} catch (Exception $e) {
+    // If query fails, set memberCount to 0
+    foreach ($activities as &$activity) {
+        $activity['memberCount'] = 0;
+    }
+}
+
+// Get revenue data for the last 6 months
+$revenueData = [];
+try {
+    $conn = $db->getConnection();
+    for ($i = 5; $i >= 0; $i--) {
+        $month = date('Y-m', strtotime("-$i months"));
+        $stmt = $conn->prepare("SELECT COALESCE(SUM(amount), 0) as total FROM payments WHERE DATE_FORMAT(date, '%Y-%m') = ? AND status = 'valide'");
+        $stmt->execute([$month]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        $monthName = date('M', strtotime($month));
+        $revenueData[] = [
+            'month' => $monthName,
+            'amount' => (int)$result['total'],
+            'expenses' => (int)($result['total'] / 2)  // Estimate expenses as 50% of revenue
+        ];
+    }
+} catch (Exception $e) {
+    $revenueData = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -74,9 +111,7 @@ $activities = $dashboardCtrl->getActivities();
                             </h3>
                             <button class="text-xs font-bold text-indigo-600 hover:underline">Détails</button>
                         </div>
-                        <div class="h-[300px] bg-gradient-to-b from-indigo-50 to-transparent rounded-xl p-4 flex items-center justify-center text-slate-400">
-                            [Graphique de revenus - Affichage simulé]
-                        </div>
+                        <canvas id="revenueChart" height="80"></canvas>
                     </div>
 
                     <!-- Sports Distribution -->
@@ -138,6 +173,80 @@ $activities = $dashboardCtrl->getActivities();
         </main>
     </div>
     <?php renderDropdownScript(); ?>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Revenue Chart
+        const ctx = document.getElementById('revenueChart').getContext('2d');
+        const revenueChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: <?php echo json_encode(array_column($revenueData, 'month')); ?>,
+                datasets: [
+                    {
+                        label: 'Revenus',
+                        data: <?php echo json_encode(array_column($revenueData, 'amount')); ?>,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                    },
+                    {
+                        label: 'Dépenses (Estimées)',
+                        data: <?php echo json_encode(array_column($revenueData, 'expenses')); ?>,
+                        borderColor: '#64748b',
+                        backgroundColor: 'rgba(100, 116, 139, 0.05)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#64748b',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString() + ' DH';
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
 <?php

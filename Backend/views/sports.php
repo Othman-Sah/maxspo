@@ -11,7 +11,8 @@ require_once 'components/Layout.php';
 
 requireLogin();
 
-$dashboardCtrl = new DashboardController();
+global $db;
+$dashboardCtrl = new DashboardController($db);
 $activities = $dashboardCtrl->getActivities();
 ?>
 <!DOCTYPE html>
