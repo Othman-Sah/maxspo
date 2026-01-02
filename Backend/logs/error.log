@@ -1,0 +1,37 @@
+[29-Dec-2025 14:56:42 Africa/Casablanca] PHP Fatal error:  Cannot use string as default value for property Database::$user of type a in C:\MAMP\htdocs\lA\Backend\config\Database.php on line 10
+[29-Dec-2025 15:02:54 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[29-Dec-2025 15:52:05 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[29-Dec-2025 15:52:05 Africa/Casablanca] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'needsport_pro.members' doesn't exist in C:\MAMP\htdocs\lA\Backend\config\Database.php:31
+Stack trace:
+#0 C:\MAMP\htdocs\lA\Backend\config\Database.php(31): mysqli->query('SELECT COUNT(*)...')
+#1 C:\MAMP\htdocs\lA\Backend\controllers\DashboardController.php(18): Database->query('SELECT COUNT(*)...')
+#2 C:\MAMP\htdocs\lA\Backend\views\dashboard.php(17): DashboardController->getStats()
+#3 C:\MAMP\htdocs\lA\Backend\index.php(28): include('C:\\MAMP\\htdocs\\...')
+#4 {main}
+  thrown in C:\MAMP\htdocs\lA\Backend\config\Database.php on line 31
+[29-Dec-2025 15:59:50 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[29-Dec-2025 15:59:50 Africa/Casablanca] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'needsport_pro.members' doesn't exist in C:\MAMP\htdocs\lA\Backend\config\Database.php:31
+Stack trace:
+#0 C:\MAMP\htdocs\lA\Backend\config\Database.php(31): mysqli->query('SELECT COUNT(*)...')
+#1 C:\MAMP\htdocs\lA\Backend\controllers\DashboardController.php(18): Database->query('SELECT COUNT(*)...')
+#2 C:\MAMP\htdocs\lA\Backend\views\dashboard.php(17): DashboardController->getStats()
+#3 C:\MAMP\htdocs\lA\Backend\index.php(28): include('C:\\MAMP\\htdocs\\...')
+#4 {main}
+  thrown in C:\MAMP\htdocs\lA\Backend\config\Database.php on line 31
+[29-Dec-2025 15:59:51 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[29-Dec-2025 15:59:51 Africa/Casablanca] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'needsport_pro.members' doesn't exist in C:\MAMP\htdocs\lA\Backend\config\Database.php:31
+Stack trace:
+#0 C:\MAMP\htdocs\lA\Backend\config\Database.php(31): mysqli->query('SELECT COUNT(*)...')
+#1 C:\MAMP\htdocs\lA\Backend\controllers\DashboardController.php(18): Database->query('SELECT COUNT(*)...')
+#2 C:\MAMP\htdocs\lA\Backend\views\dashboard.php(17): DashboardController->getStats()
+#3 C:\MAMP\htdocs\lA\Backend\index.php(28): include('C:\\MAMP\\htdocs\\...')
+#4 {main}
+  thrown in C:\MAMP\htdocs\lA\Backend\config\Database.php on line 31
+[02-Jan-2026 11:45:19 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 11:45:22 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 11:45:30 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 11:45:37 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 11:45:39 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 11:45:48 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 11:45:52 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
+[02-Jan-2026 11:45:54 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
