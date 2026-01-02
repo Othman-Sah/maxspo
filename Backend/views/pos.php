@@ -8,7 +8,7 @@ global $db;
 
 // Create POS tables if not exist
 try {
-    $db->exec("CREATE TABLE IF NOT EXISTS pos_products (
+    $db->conn->exec("CREATE TABLE IF NOT EXISTS pos_products (
         id INT PRIMARY KEY AUTO_INCREMENT,
         name VARCHAR(100) NOT NULL,
         category VARCHAR(50),
@@ -17,7 +17,7 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
     
-    $db->exec("CREATE TABLE IF NOT EXISTS pos_sales (
+    $db->conn->exec("CREATE TABLE IF NOT EXISTS pos_sales (
         id INT PRIMARY KEY AUTO_INCREMENT,
         total DECIMAL(10,2) NOT NULL,
         payment_method VARCHAR(50),
@@ -25,7 +25,7 @@ try {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )");
     
-    $db->exec("CREATE TABLE IF NOT EXISTS pos_sale_items (
+    $db->conn->exec("CREATE TABLE IF NOT EXISTS pos_sale_items (
         id INT PRIMARY KEY AUTO_INCREMENT,
         sale_id INT NOT NULL,
         product_id INT NOT NULL,
@@ -49,9 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $price = floatval($_POST['price'] ?? 0);
                 $stock = intval($_POST['stock'] ?? 0);
                 
-                $stmt = $db->prepare("INSERT INTO pos_products (name, category, price, stock) VALUES (?, ?, ?, ?)");
+                $stmt = $db->conn->prepare("INSERT INTO pos_products (name, category, price, stock) VALUES (?, ?, ?, ?)");
                 $stmt->execute([$name, $category, $price, $stock]);
-                echo json_encode(['success' => true, 'id' => $db->lastInsertId()]);
+                echo json_encode(['success' => true, 'id' => $db->conn->lastInsertId()]);
                 exit;
             
             case 'update_product':
@@ -61,14 +61,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $price = floatval($_POST['price'] ?? 0);
                 $stock = intval($_POST['stock'] ?? 0);
                 
-                $stmt = $db->prepare("UPDATE pos_products SET name = ?, category = ?, price = ?, stock = ? WHERE id = ?");
+                $stmt = $db->conn->prepare("UPDATE pos_products SET name = ?, category = ?, price = ?, stock = ? WHERE id = ?");
                 $stmt->execute([$name, $category, $price, $stock, $id]);
                 echo json_encode(['success' => true]);
                 exit;
             
             case 'delete_product':
                 $id = intval($_POST['id']);
-                $stmt = $db->prepare("DELETE FROM pos_products WHERE id = ?");
+                $stmt = $db->conn->prepare("DELETE FROM pos_products WHERE id = ?");
                 $stmt->execute([$id]);
                 echo json_encode(['success' => true]);
                 exit;
@@ -90,12 +90,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $itemsCount += intval($item['quantity']);
                 }
                 
-                $saleStmt = $db->prepare("INSERT INTO pos_sales (total, payment_method, items_count) VALUES (?, ?, ?)");
+                $saleStmt = $db->conn->prepare("INSERT INTO pos_sales (total, payment_method, items_count) VALUES (?, ?, ?)");
                 $saleStmt->execute([$total, $paymentMethod, $itemsCount]);
-                $saleId = $db->lastInsertId();
+                $saleId = $db->conn->lastInsertId();
                 
                 foreach ($items as $item) {
-                    $itemStmt = $db->prepare("INSERT INTO pos_sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?, ?)");
+                    $itemStmt = $db->conn->prepare("INSERT INTO pos_sale_items (sale_id, product_id, product_name, quantity, unit_price, subtotal) VALUES (?, ?, ?, ?, ?, ?)");
                     $subtotal = floatval($item['price']) * intval($item['quantity']);
                     $itemStmt->execute([
                         $saleId,
@@ -106,7 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $subtotal
                     ]);
                     
-                    $updateStmt = $db->prepare("UPDATE pos_products SET stock = stock - ? WHERE id = ?");
+                    $updateStmt = $db->conn->prepare("UPDATE pos_products SET stock = stock - ? WHERE id = ?");
                     $updateStmt->execute([intval($item['quantity']), intval($item['id'])]);
                 }
                 
@@ -117,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get all products
-$stmt = $db->query("SELECT * FROM pos_products ORDER BY category, name");
+$stmt = $db->conn->query("SELECT * FROM pos_products ORDER BY category, name");
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $currentPage = 'pos';
 
