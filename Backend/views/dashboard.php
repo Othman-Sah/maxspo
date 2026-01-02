@@ -59,16 +59,28 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEEDSPORT Pro - Tableau de bord</title>
+    <script>tailwind = { config: { darkMode: 'class' } };</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            const htmlElement = document.documentElement;
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                htmlElement.classList.add('dark');
+            }
+        })();
+    </script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f8fafc;
         }
+        html.dark { background-color: #0f172a; color: #f1f5f9; }
+        body.dark { background-color: #0f172a; color: #f1f5f9; }
     </style>
 </head>
-<body>
+<body class="dark:bg-slate-950 transition-colors">
     <div class="flex min-h-screen bg-slate-50">
         <?php renderSidebar('dashboard'); ?>
 

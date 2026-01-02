@@ -130,3 +130,16 @@ Stack trace:
 #1 {main}
   thrown in C:\MAMP\htdocs\lA\Backend\views\pos.php on line 47
 [02-Jan-2026 18:40:36 Africa/Casablanca] PHP Fatal error:  Cannot redeclare getProductEmoji() (previously declared in C:\MAMP\htdocs\lA\Backend\views\pos.php:9) in C:\MAMP\htdocs\lA\Backend\views\pos.php on line 171
+[02-Jan-2026 20:55:07 Africa/Casablanca] PHP Warning:  require_once(components/ThemeHead.php): Failed to open stream: No such file or directory in C:\MAMP\htdocs\lA\Backend\views\pos.php on line 173
+[02-Jan-2026 20:55:07 Africa/Casablanca] PHP Fatal error:  Uncaught Error: Failed opening required 'components/ThemeHead.php' (include_path='.;C:\php\pear') in C:\MAMP\htdocs\lA\Backend\views\pos.php:173
+Stack trace:
+#0 C:\MAMP\htdocs\lA\Backend\index.php(28): include()
+#1 {main}
+  thrown in C:\MAMP\htdocs\lA\Backend\views\pos.php on line 173
+[02-Jan-2026 21:23:40 Africa/Casablanca] PHP Fatal error:  Uncaught Error: Call to undefined method Database::prepare() in C:\MAMP\htdocs\lA\Backend\controllers\SettingsController.php:19
+Stack trace:
+#0 C:\MAMP\htdocs\lA\Backend\controllers\SettingsController.php(42): SettingsController->getSetting('profile_info', Array)
+#1 C:\MAMP\htdocs\lA\Backend\views\settings.php(13): SettingsController->getProfileInfo()
+#2 C:\MAMP\htdocs\lA\Backend\index.php(28): include('C:\\MAMP\\htdocs\\...')
+#3 {main}
+  thrown in C:\MAMP\htdocs\lA\Backend\controllers\SettingsController.php on line 19

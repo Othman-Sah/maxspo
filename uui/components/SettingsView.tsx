@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Settings, 
   Palette, 
@@ -19,17 +19,78 @@ import {
   User,
   Camera,
   MapPin,
-  Mail
+  Mail,
+  AlertCircle
 } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 type SettingsSection = 'profile' | 'general' | 'branding' | 'payments' | 'notifications' | 'security';
 
 const SettingsView: React.FC = () => {
+  const { setThemeColor: updateGlobalTheme } = useTheme();
   const [activeSection, setActiveSection] = useState<SettingsSection>('profile');
   const [hasChanges, setHasChanges] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveMessage, setSaveMessage] = useState('');
+  const [saveError, setSaveError] = useState('');
+  
+  // Profile state
+  const [profileName, setProfileName] = useState('Admin Coach');
+  const [profileEmail, setProfileEmail] = useState('super-admin@needsport.ma');
+  const [profileCity, setProfileCity] = useState('Casablanca, Maroc');
+  
+  // General settings state
   const [clubName, setClubName] = useState('NEEDSPORT Pro');
+  const [slogan, setSlogan] = useState('La performance au quotidien');
   const [themeColor, setThemeColor] = useState('indigo');
   const [language, setLanguage] = useState('fr');
+  const [timezone, setTimezone] = useState('(GMT+01:00) Casablanca');
+  
+  // Payment settings state
+  const [currency, setCurrency] = useState('DH');
+  const [taxRate, setTaxRate] = useState('20');
+
+  // Load settings on component mount
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    try {
+      const response = await fetch('../Backend/api/settings.php?action=all');
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Load general settings
+        if (data.general) {
+          setClubName(data.general.clubName || 'NEEDSPORT Pro');
+          setSlogan(data.general.slogan || 'La performance au quotidien');
+          setLanguage(data.general.language || 'fr');
+          setTimezone(data.general.timezone || '(GMT+01:00) Casablanca');
+        }
+        
+        // Load theme settings
+        if (data.theme) {
+          setThemeColor(data.theme.themeColor || 'indigo');
+        }
+        
+        // Load profile info
+        if (data.profile) {
+          setProfileName(data.profile.name || 'Admin Coach');
+          setProfileEmail(data.profile.email || 'super-admin@needsport.ma');
+          setProfileCity(data.profile.city || 'Casablanca, Maroc');
+        }
+        
+        // Load payment settings
+        if (data.payments) {
+          setCurrency(data.payments.currency || 'DH');
+          setTaxRate(String(data.payments.taxRate) || '20');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+    }
+  };
 
   const navItems = [
     { id: 'profile', icon: User, label: 'Mon Profil' },
@@ -40,9 +101,76 @@ const SettingsView: React.FC = () => {
     { id: 'security', icon: Shield, label: 'Accès & Sécurité' },
   ];
 
-  const handleSave = () => {
-    setHasChanges(false);
-    alert('Paramètres enregistrés avec succès !');
+  const handleSave = async () => {
+    setIsSaving(true);
+    setSaveMessage('');
+    setSaveError('');
+
+    try {
+      let response;
+      
+      // Save based on active section
+      if (activeSection === 'profile') {
+        response = await fetch('../Backend/api/settings.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'save_profile',
+            name: profileName,
+            email: profileEmail,
+            city: profileCity,
+          }),
+        });
+      } else if (activeSection === 'general') {
+        response = await fetch('../Backend/api/settings.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'save_general',
+            clubName,
+            slogan,
+            language,
+            timezone,
+          }),
+        });
+      } else if (activeSection === 'branding') {
+        response = await fetch('../Backend/api/settings.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'save_branding',
+            themeColor,
+          }),
+        });
+        
+        // Apply theme color globally
+        updateGlobalTheme(themeColor);
+      } else if (activeSection === 'payments') {
+        response = await fetch('../Backend/api/settings.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'save_payments',
+            currency,
+            taxRate: parseFloat(taxRate),
+          }),
+        });
+      }
+
+      if (response && response.ok) {
+        const result = await response.json();
+        setSaveMessage(result.message || 'Paramètres enregistrés avec succès !');
+        setHasChanges(false);
+        setTimeout(() => setSaveMessage(''), 3000);
+      } else {
+        throw new Error('Failed to save settings');
+      }
+    } catch (error) {
+      setSaveError('Erreur lors de l\'enregistrement des paramètres');
+      console.error(error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const ColorPicker = ({ color }: { color: string }) => (
@@ -72,13 +200,28 @@ const SettingsView: React.FC = () => {
         {hasChanges && (
           <button 
             onClick={handleSave}
-            className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-100 animate-in zoom-in"
+            disabled={isSaving}
+            className="flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-black rounded-2xl hover:bg-indigo-700 disabled:opacity-50 transition-all shadow-xl shadow-indigo-100 animate-in zoom-in"
           >
             <Save size={20} />
-            Enregistrer les modifications
+            {isSaving ? 'Enregistrement...' : 'Enregistrer les modifications'}
           </button>
         )}
       </div>
+
+      {saveMessage && (
+        <div className="mb-4 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center gap-3 animate-in fade-in">
+          <Check className="text-emerald-600" size={20} />
+          <p className="text-emerald-700 font-bold">{saveMessage}</p>
+        </div>
+      )}
+
+      {saveError && (
+        <div className="mb-4 p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-3 animate-in fade-in">
+          <AlertCircle className="text-rose-600" size={20} />
+          <p className="text-rose-700 font-bold">{saveError}</p>
+        </div>
+      )}
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sub Navigation */}
@@ -129,9 +272,9 @@ const SettingsView: React.FC = () => {
                           <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
                           <input 
                             type="text" 
-                            defaultValue="Admin Coach"
+                            value={profileName}
+                            onChange={(e) => {setProfileName(e.target.value); setHasChanges(true);}}
                             className="w-full pl-12 pr-5 py-3.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-2xl outline-none transition-all font-bold text-slate-700"
-                            onChange={() => setHasChanges(true)}
                           />
                         </div>
                       </div>
@@ -153,9 +296,9 @@ const SettingsView: React.FC = () => {
                           <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
                           <input 
                             type="email" 
-                            defaultValue="super-admin@needsport.ma"
+                            value={profileEmail}
+                            onChange={(e) => {setProfileEmail(e.target.value); setHasChanges(true);}}
                             className="w-full pl-12 pr-5 py-3.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-2xl outline-none transition-all font-bold text-slate-700"
-                            onChange={() => setHasChanges(true)}
                           />
                         </div>
                       </div>
@@ -165,9 +308,9 @@ const SettingsView: React.FC = () => {
                           <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" />
                           <input 
                             type="text" 
-                            defaultValue="Casablanca, Maroc"
+                            value={profileCity}
+                            onChange={(e) => {setProfileCity(e.target.value); setHasChanges(true);}}
                             className="w-full pl-12 pr-5 py-3.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-2xl outline-none transition-all font-bold text-slate-700"
-                            onChange={() => setHasChanges(true)}
                           />
                         </div>
                       </div>
@@ -200,7 +343,8 @@ const SettingsView: React.FC = () => {
                     <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Slogan / Sous-titre</label>
                     <input 
                       type="text" 
-                      placeholder="La performance au quotidien"
+                      value={slogan}
+                      onChange={(e) => {setSlogan(e.target.value); setHasChanges(true);}}
                       className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-2xl outline-none transition-all font-bold text-slate-700"
                     />
                   </div>
@@ -227,10 +371,14 @@ const SettingsView: React.FC = () => {
                   </div>
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Fuseau horaire</label>
-                    <select className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-2xl outline-none transition-all font-bold text-slate-700">
-                      <option>(GMT+01:00) Casablanca</option>
-                      <option>(GMT+00:00) London</option>
-                      <option>(GMT+01:00) Paris</option>
+                    <select 
+                      className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-2xl outline-none transition-all font-bold text-slate-700"
+                      value={timezone}
+                      onChange={(e) => {setTimezone(e.target.value); setHasChanges(true);}}
+                    >
+                      <option value="(GMT+01:00) Casablanca">(GMT+01:00) Casablanca</option>
+                      <option value="(GMT+00:00) London">(GMT+00:00) London</option>
+                      <option value="(GMT+01:00) Paris">(GMT+01:00) Paris</option>
                     </select>
                   </div>
                 </div>
@@ -298,7 +446,11 @@ const SettingsView: React.FC = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Devise Principale</label>
-                    <select className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-2xl outline-none transition-all font-bold text-slate-700" defaultValue="DH">
+                    <select 
+                      className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-2xl outline-none transition-all font-bold text-slate-700"
+                      value={currency}
+                      onChange={(e) => {setCurrency(e.target.value); setHasChanges(true);}}
+                    >
                       <option value="DH">Dirham Marocain (DH)</option>
                       <option value="EUR">Euro (€)</option>
                       <option value="USD">US Dollar ($)</option>
@@ -308,7 +460,8 @@ const SettingsView: React.FC = () => {
                     <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest ml-1">Taux de TVA (%)</label>
                     <input 
                       type="number" 
-                      placeholder="20"
+                      value={taxRate}
+                      onChange={(e) => {setTaxRate(e.target.value); setHasChanges(true);}}
                       className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 focus:bg-white focus:border-indigo-500 rounded-2xl outline-none transition-all font-bold text-slate-700"
                     />
                   </div>

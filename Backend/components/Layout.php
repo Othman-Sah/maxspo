@@ -66,7 +66,7 @@ function renderSidebar($activePage) {
             <span class="text-xl font-bold text-slate-900 tracking-tight">NEEDSPORT</span>
         </div>
 
-        <nav class="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
+        <nav class="flex-1 px-4 py-2 space-y-1">
             <!-- Dashboard -->
             <a href="index.php?page=dashboard" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium <?php echo $activePage === 'dashboard' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'; ?>">
                 <?php echo dashboardIcon(20); ?> Tableau de bord
@@ -91,15 +91,15 @@ function renderSidebar($activePage) {
                 'members' => ['icon' => usersIcon(20), 'label' => 'Membres'],
                 'sports' => ['icon' => dumbbellIcon(20), 'label' => 'Activités'],
                 'schedule' => ['icon' => calendarIcon(20), 'label' => 'Planning'],
-                'financials' => ['icon' => chartIcon(20), 'label' => 'Finances'],
+                'financials' => ['icon' => chartIcon(20), 'label' => 'Finances', 'link' => 'financials-payments'],
                 'staff' => ['icon' => userIcon(20), 'label' => 'Équipe Staff'],
                 'pos' => ['icon' => icon('shopping-cart', 20), 'label' => 'Caisse POS'],
-                'payments' => ['icon' => creditcardIcon(20), 'label' => 'Journal Paiements'],
             ];
             foreach ($navItems as $id => $item):
-                $isActive = $activePage === $id ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900';
+                $link = isset($item['link']) ? $item['link'] : $id;
+                $isActive = ($activePage === $id || ($id === 'financials' && $activePage === 'financials-payments') || ($id === 'payments' && $activePage === 'financials-payments')) ? 'bg-indigo-50 text-indigo-600' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900';
                 ?>
-                <a href="index.php?page=<?php echo $id; ?>" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium <?php echo $isActive; ?>">
+                <a href="index.php?page=<?php echo $link; ?>" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 font-medium <?php echo $isActive; ?>">
                     <?php echo $item['icon']; ?> <?php echo $item['label']; ?>
                 </a>
             <?php endforeach; ?>

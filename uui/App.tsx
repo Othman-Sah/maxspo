@@ -41,12 +41,12 @@ import {
   AreaChart,
   Area
 } from 'recharts';
+import { ThemeProvider } from './context/ThemeContext';
 import Sidebar from './components/Sidebar';
 import StatCard from './components/StatCard';
 import MemberRow from './components/MemberRow';
 import MembersView from './components/MembersView';
 import ActivitiesView from './components/ActivitiesView';
-import PaymentsView from './components/PaymentsView';
 import AddMemberView from './components/AddMemberView';
 import AddActivityView from './components/AddActivityView';
 import SettingsView from './components/SettingsView';
@@ -55,7 +55,7 @@ import NotificationDropdown from './components/NotificationDropdown';
 import ProfileDropdown from './components/ProfileDropdown';
 import QuickActionModal from './components/QuickActionModal';
 import ScheduleView from './components/ScheduleView';
-import FinancialsView from './components/FinancialsView';
+import FinancialsPaymentsView from './components/FinancialsPaymentsView';
 import StaffView from './components/StaffView';
 import POSView from './components/POSView';
 import LoginView from './components/LoginView';
@@ -567,11 +567,12 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="flex min-h-screen bg-slate-50">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+    <ThemeProvider>
+      <div className="flex min-h-screen bg-slate-50">
+        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <main className="flex-1 min-w-0 overflow-auto">
-        <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-20">
+        <main className="flex-1 min-w-0 overflow-auto">
+          <header className="h-20 bg-white border-b border-slate-200 px-8 flex items-center justify-between sticky top-0 z-20">
           <div className="flex-1 max-w-xl relative group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={20} />
             <input 
@@ -724,10 +725,11 @@ const App: React.FC = () => {
             />
           )}
           {activeTab === 'financials' && (
-            <FinancialsView 
+            <FinancialsPaymentsView 
               onAddExpense={handleAddExpense}
               onExport={() => handleExport("Rapport_Financier_2024")}
               onViewExpense={handleViewExpense}
+              onPrint={() => handlePrint("Journal des paiements")}
             />
           )}
           {activeTab === 'staff' && (
@@ -744,9 +746,11 @@ const App: React.FC = () => {
             />
           )}
           {activeTab === 'payments' && (
-            <PaymentsView 
+            <FinancialsPaymentsView 
+              onAddExpense={handleAddExpense}
+              onExport={() => handleExport("Rapport_Financier_2024")}
+              onViewExpense={handleViewExpense}
               onPrint={() => handlePrint("Journal des paiements")}
-              onExport={() => handleExport("Paiements_2024")}
             />
           )}
           {activeTab === 'settings' && <SettingsView />}
@@ -766,7 +770,8 @@ const App: React.FC = () => {
       >
         {modalConfig.content}
       </QuickActionModal>
-    </div>
+      </div>
+    </ThemeProvider>
   );
 };
 

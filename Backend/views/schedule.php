@@ -175,8 +175,18 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEEDSPORT Pro - Schedule</title>
+    <script>tailwind = { config: { darkMode: 'class' } };</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            const htmlElement = document.documentElement;
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                htmlElement.classList.add('dark');
+            }
+        })();
+    </script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .animate-in { animation: animateIn 0.5s ease-out forwards; }
@@ -187,9 +197,11 @@ try {
         .drop-slot.drag-over { background-color: rgba(99, 102, 241, 0.15); border-color: rgb(99, 102, 241); box-shadow: inset 0 0 10px rgba(99, 102, 241, 0.2); }
         .schedule-card { box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15); }
         .schedule-card:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2); }
+        html.dark { background-color: #0f172a; color: #f1f5f9; }
+        body.dark { background-color: #0f172a; color: #f1f5f9; }
     </style>
 </head>
-<body class="bg-slate-50">
+<body class="bg-slate-50 dark:bg-slate-950 transition-colors">
     <div class="flex min-h-screen">
         <?php renderSidebar($currentPage); ?>
 

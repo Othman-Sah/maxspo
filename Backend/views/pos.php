@@ -169,21 +169,33 @@ $currentPage = 'pos';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NEEDSPORT Pro - Caisse & Snacks</title>
+    <script>tailwind = { config: { darkMode: 'class' } };</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        (function() {
+            const htmlElement = document.documentElement;
+            const isDarkMode = localStorage.getItem('darkMode') === 'true';
+            if (isDarkMode) {
+                htmlElement.classList.add('dark');
+            }
+        })();
+    </script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .animate-in { animation: animateIn 0.5s ease-out forwards; }
         @keyframes animateIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        html.dark { background-color: #0f172a; color: #f1f5f9; }
+        body.dark { background-color: #0f172a; color: #f1f5f9; }
     </style>
 </head>
-<body class="bg-slate-50">
+<body class="bg-slate-50 transition-colors">
     <div class="flex h-screen">
         <?php renderSidebar($currentPage); ?>
 
-        <main class="flex-1 min-w-0">
+        <main class="flex-1 min-w-0 transition-colors">
             <div class="flex flex-col lg:flex-row gap-8 h-full">
                 <!-- Main Content -->
                 <div class="flex-1 flex flex-col p-8 overflow-hidden">
@@ -197,8 +209,8 @@ $currentPage = 'pos';
                         </div>
                         <div class="flex items-center gap-3">
                             <div class="relative">
-                                <?php echo icon('search', 20, 'absolute left-4 top-1/2 -translate-y-1/2 text-slate-400'); ?>
-                                <input type="text" id="search-input" placeholder="Rechercher produit..." class="pl-12 pr-4 py-3 bg-white border border-slate-100 rounded-2xl outline-none focus:border-indigo-500 font-bold text-sm w-full md:w-64 shadow-sm" />
+                                <?php echo icon('search', 20, 'absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500'); ?>
+                                <input type="text" id="search-input" placeholder="Rechercher produit..." class="pl-12 pr-4 py-3 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl outline-none focus:border-indigo-500 dark:focus:border-indigo-400 font-bold text-sm w-full md:w-64 shadow-sm text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500" />
                             </div>
                             <button onclick="openAddProductModal()" class="p-3 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition-all active:scale-95 group" title="Ajouter un nouveau produit">
                                 <?php echo icon('plus-circle', 24, 'group-hover:rotate-90 transition-transform duration-300'); ?>
@@ -207,17 +219,17 @@ $currentPage = 'pos';
                     </div>
 
                     <div id="category-filters" class="flex gap-2 overflow-x-auto pb-4 shrink-0 no-scrollbar animate-in" style="animation-delay: 0.1s;">
-                        <button data-category="all" class="px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap border bg-slate-900 text-white border-slate-900 shadow-lg">Tout</button>
-                        <button data-category="complement" class="px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap border bg-white text-slate-400 border-slate-100 hover:border-slate-300">Compléments</button>
-                        <button data-category="snack" class="px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap border bg-white text-slate-400 border-slate-100 hover:border-slate-300">Snacks</button>
-                        <button data-category="boisson" class="px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap border bg-white text-slate-400 border-slate-100 hover:border-slate-300">Boissons</button>
+                        <button data-category="all" class="px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap border bg-indigo-600 dark:bg-indigo-600 text-white dark:text-white border-indigo-600 dark:border-indigo-600 shadow-lg hover:bg-indigo-700">Tout</button>
+                        <button data-category="complement" class="px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap border bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-400 border-slate-100 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600">Compléments</button>
+                        <button data-category="snack" class="px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap border bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-400 border-slate-100 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600">Snacks</button>
+                        <button data-category="boisson" class="px-6 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest transition-all whitespace-nowrap border bg-white dark:bg-slate-800 text-slate-400 dark:text-slate-400 border-slate-100 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600">Boissons</button>
                     </div>
 
                     <div id="product-grid" class="flex-1 overflow-y-auto pr-4 grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 animate-in" style="animation-delay: 0.2s;">
                         <?php foreach ($products as $product): ?>
                             <div class="group relative">
                                 <button
-                                    class="product-card bg-white p-5 rounded-[28px] border border-slate-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all text-left flex flex-col w-full active:scale-95"
+                                    class="product-card bg-white dark:bg-slate-800 p-5 rounded-[28px] border border-slate-100 dark:border-slate-700 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all text-left flex flex-col w-full active:scale-95"
                                     data-id="<?php echo $product['id']; ?>"
                                     data-name="<?php echo htmlspecialchars($product['name']); ?>"
                                     data-price="<?php echo $product['price']; ?>"
@@ -227,11 +239,11 @@ $currentPage = 'pos';
                                     <div class="h-32 w-full rounded-2xl mb-4 flex items-center justify-center text-4xl group-hover:scale-110 transition-transform <?php echo getProductColorClass($product['category']); ?>">
                                         <?php echo getProductEmoji($product['category']); ?>
                                     </div>
-                                    <p class="text-[10px] font-black uppercase text-slate-400 mb-1"><?php echo htmlspecialchars($product['category']); ?></p>
-                                    <h3 class="text-sm font-black text-slate-900 flex-1 leading-tight"><?php echo htmlspecialchars($product['name']); ?></h3>
+                                    <p class="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 mb-1"><?php echo htmlspecialchars($product['category']); ?></p>
+                                    <h3 class="text-sm font-black text-slate-900 dark:text-white flex-1 leading-tight"><?php echo htmlspecialchars($product['name']); ?></h3>
                                     <div class="mt-4 flex items-center justify-between">
-                                        <span class="text-lg font-black text-slate-900"><?php echo $product['price']; ?> DH</span>
-                                        <span class="text-[10px] font-bold text-slate-400">Stock: <?php echo $product['stock']; ?></span>
+                                        <span class="text-lg font-black text-slate-900 dark:text-white"><?php echo $product['price']; ?> DH</span>
+                                        <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500">Stock: <?php echo $product['stock']; ?></span>
                                     </div>
                                 </button>
                                 <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
@@ -244,7 +256,7 @@ $currentPage = 'pos';
                                 </div>
                             </div>
                         <?php endforeach; ?>
-                         <button onclick="openAddProductModal()" class="p-5 rounded-[28px] border-2 border-dashed border-slate-200 text-slate-300 hover:border-indigo-300 hover:bg-indigo-50/30 transition-all flex flex-col items-center justify-center text-center gap-3 py-12">
+                         <button onclick="openAddProductModal()" class="p-5 rounded-[28px] border-2 border-dashed border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 hover:border-indigo-300 dark:hover:border-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 transition-all flex flex-col items-center justify-center text-center gap-3 py-12">
                             <?php echo icon('plus', 32); ?>
                             <span class="text-xs font-black uppercase tracking-widest">Nouveau Produit</span>
                         </button>
@@ -252,42 +264,42 @@ $currentPage = 'pos';
                 </div>
 
                 <!-- Cart Sidebar -->
-                <div class="w-full lg:w-96 bg-white rounded-[40px] border border-slate-100 shadow-2xl flex flex-col overflow-hidden animate-in" style="animation-delay: 0.3s;">
-                    <div class="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
-                       <h2 class="text-xl font-black text-slate-900 flex items-center gap-2">
+                <div class="w-full lg:w-96 bg-white dark:bg-slate-800 rounded-[40px] border border-slate-100 dark:border-slate-700 shadow-2xl flex flex-col overflow-hidden animate-in" style="animation-delay: 0.3s;">
+                    <div class="p-8 border-b border-slate-50 dark:border-slate-700 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
+                       <h2 class="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                          <?php echo icon('shopping-cart', 24, 'text-indigo-600'); ?> Panier
                        </h2>
                        <span id="cart-total-items" class="bg-indigo-600 text-white text-[10px] font-black px-2 py-1 rounded-full">0 ARTICLES</span>
                     </div>
 
                     <div id="cart-items-container" class="flex-1 overflow-y-auto p-6 space-y-4">
-                        <div id="empty-cart-message" class="h-full flex flex-col items-center justify-center text-center space-y-4 text-slate-300 py-20">
+                        <div id="empty-cart-message" class="h-full flex flex-col items-center justify-center text-center space-y-4 text-slate-300 dark:text-slate-600 py-20">
                             <?php echo icon('package', 64, 'opacity-20'); ?>
                             <p class="text-sm font-bold">Votre panier est vide.</p>
                         </div>
                     </div>
 
-                    <div class="p-8 bg-slate-900 text-white space-y-6">
+                    <div class="p-8 bg-slate-900 dark:bg-slate-950 text-white space-y-6">
                         <div class="space-y-3">
-                             <div class="flex justify-between text-slate-400 text-xs font-bold uppercase tracking-widest">
+                             <div class="flex justify-between text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-widest">
                                 <span>Sous-total</span>
                                 <span id="cart-subtotal">0 DH</span>
                              </div>
-                             <div class="flex justify-between text-indigo-400 text-xs font-bold uppercase tracking-widest">
+                             <div class="flex justify-between text-indigo-400 dark:text-indigo-400 text-xs font-bold uppercase tracking-widest">
                                 <span>Remise</span>
                                 <span>0 DH</span>
                              </div>
-                             <div class="pt-3 border-t border-white/10 flex justify-between items-baseline">
+                             <div class="pt-3 border-t border-white/10 dark:border-white/5 flex justify-between items-baseline">
                                 <span class="text-sm font-black">TOTAL À PAYER</span>
                                 <span class="text-4xl font-black text-emerald-400"><span id="cart-total">0</span> <span class="text-xl">DH</span></span>
                              </div>
                         </div>
                         <div class="grid grid-cols-2 gap-3">
-                             <button onclick="processPayment('cash')" class="flex flex-col items-center justify-center p-4 bg-white/10 hover:bg-white/20 rounded-2xl transition-all group">
+                             <button onclick="processPayment('cash')" class="flex flex-col items-center justify-center p-4 bg-white/10 dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/10 rounded-2xl transition-all group">
                                 <span class="text-emerald-400 group-hover:scale-110 transition-transform text-2xl mb-1">💵</span>
                                 <span class="text-[10px] font-black uppercase">Espèces</span>
                              </button>
-                             <button onclick="processPayment('card')" class="flex flex-col items-center justify-center p-4 bg-indigo-600 hover:bg-indigo-700 rounded-2xl transition-all shadow-lg shadow-indigo-500/20 group">
+                             <button onclick="processPayment('card')" class="flex flex-col items-center justify-center p-4 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 rounded-2xl transition-all shadow-lg shadow-indigo-500/20 group">
                                 <span class="text-white group-hover:scale-110 transition-transform text-2xl mb-1">💳</span>
                                 <span class="text-[10px] font-black uppercase">Carte / NFC</span>
                              </button>
@@ -302,7 +314,7 @@ $currentPage = 'pos';
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
             const cart = [];
             const productGrid = document.getElementById('product-grid');
             const cartItemsContainer = document.getElementById('cart-items-container');
@@ -329,19 +341,19 @@ $currentPage = 'pos';
                                 </div>
                                 <div class="flex-1 min-w-0">
                                     <div class="flex justify-between items-start">
-                                        <h4 class="text-sm font-black text-slate-900 truncate pr-2">${item.name}</h4>
-                                        <button data-remove-id="${item.id}" class="text-slate-300 hover:text-rose-500 transition-colors">
+                                        <h4 class="text-sm font-black text-slate-900 dark:text-white truncate pr-2">${item.name}</h4>
+                                        <button data-remove-id="${item.id}" class="text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-500 transition-colors">
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                                         </button>
                                     </div>
-                                    <p class="text-xs font-bold text-slate-400">${item.price} DH / un.</p>
+                                    <p class="text-xs font-bold text-slate-400 dark:text-slate-500">${item.price} DH / un.</p>
                                     <div class="mt-2 flex items-center justify-between">
-                                         <div class="flex items-center bg-slate-100 rounded-lg p-1">
-                                            <button data-update-id="${item.id}" data-delta="-1" class="p-1 hover:bg-white rounded transition-colors text-slate-500"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
-                                            <span class="px-3 text-xs font-black">${item.quantity}</span>
-                                            <button data-update-id="${item.id}" data-delta="1" class="p-1 hover:bg-white rounded transition-colors text-slate-500"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                                         <div class="flex items-center bg-slate-100 dark:bg-slate-700 rounded-lg p-1">
+                                            <button data-update-id="${item.id}" data-delta="-1" class="p-1 hover:bg-white dark:hover:bg-slate-600 rounded transition-colors text-slate-500 dark:text-slate-400"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
+                                            <span class="px-3 text-xs font-black text-slate-900 dark:text-white">${item.quantity}</span>
+                                            <button data-update-id="${item.id}" data-delta="1" class="p-1 hover:bg-white dark:hover:bg-slate-600 rounded transition-colors text-slate-500 dark:text-slate-400"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
                                          </div>
-                                         <span class="text-sm font-black text-indigo-600">${item.price * item.quantity} DH</span>
+                                         <span class="text-sm font-black text-indigo-600 dark:text-indigo-400">${item.price * item.quantity} DH</span>
                                     </div>
                                 </div>
                             </div>
@@ -586,32 +598,32 @@ $currentPage = 'pos';
 
     <!-- Add Product Modal -->
     <div id="addProductModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4">Nouveau Produit</h2>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Nouveau Produit</h2>
             <form onsubmit="addProduct(event)" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Nom</label>
-                    <input type="text" name="name" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Nom</label>
+                    <input type="text" name="name" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Catégorie</label>
-                    <select name="category" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Catégorie</label>
+                    <select name="category" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
                         <option value="complement">Complément</option>
                         <option value="snack">Snack</option>
                         <option value="boisson">Boisson</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Prix (DH)</label>
-                    <input type="number" name="price" step="0.01" min="0" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Prix (DH)</label>
+                    <input type="number" name="price" step="0.01" min="0" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Stock</label>
-                    <input type="number" name="stock" min="0" value="0" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Stock</label>
+                    <input type="number" name="stock" min="0" value="0" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
                 </div>
                 <div class="flex gap-2 pt-4">
                     <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Ajouter</button>
-                    <button type="button" onclick="closeAddProductModal()" class="flex-1 px-4 py-2 bg-slate-200 text-slate-900 font-bold rounded-lg">Annuler</button>
+                    <button type="button" onclick="closeAddProductModal()" class="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white font-bold rounded-lg">Annuler</button>
                 </div>
             </form>
         </div>
@@ -619,33 +631,33 @@ $currentPage = 'pos';
 
     <!-- Edit Product Modal -->
     <div id="editProductModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
-            <h2 class="text-2xl font-bold text-slate-900 mb-4">Modifier Produit</h2>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Modifier Produit</h2>
             <form onsubmit="saveProductEdit(event)" class="space-y-4">
                 <input type="hidden" id="editProductId">
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Nom</label>
-                    <input type="text" id="editProductName" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Nom</label>
+                    <input type="text" id="editProductName" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Catégorie</label>
-                    <select id="editProductCategory" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Catégorie</label>
+                    <select id="editProductCategory" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
                         <option value="complement">Complément</option>
                         <option value="snack">Snack</option>
                         <option value="boisson">Boisson</option>
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Prix (DH)</label>
-                    <input type="number" id="editProductPrice" step="0.01" min="0" required class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Prix (DH)</label>
+                    <input type="number" id="editProductPrice" step="0.01" min="0" required class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700 mb-2">Stock</label>
-                    <input type="number" id="editProductStock" min="0" class="w-full px-4 py-2 border border-slate-300 rounded-lg">
+                    <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Stock</label>
+                    <input type="number" id="editProductStock" min="0" class="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white">
                 </div>
                 <div class="flex gap-2 pt-4">
                     <button type="submit" class="flex-1 px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Modifier</button>
-                    <button type="button" onclick="closeEditProductModal()" class="flex-1 px-4 py-2 bg-slate-200 text-slate-900 font-bold rounded-lg">Annuler</button>
+                    <button type="button" onclick="closeEditProductModal()" class="flex-1 px-4 py-2 bg-slate-200 dark:bg-slate-700 text-slate-900 dark:text-white font-bold rounded-lg">Annuler</button>
                 </div>
             </form>
         </div>
@@ -653,10 +665,10 @@ $currentPage = 'pos';
 
     <!-- Payment Success Modal -->
     <div id="paymentModal" class="hidden fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 text-center">
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 text-center">
             <div class="text-5xl mb-4">✅</div>
-            <h2 class="text-2xl font-bold text-slate-900 mb-2">Paiement Réussi!</h2>
-            <p class="text-slate-600 mb-4">Numéro de vente: <span id="saleId" class="font-bold text-indigo-600"></span></p>
+            <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Paiement Réussi!</h2>
+            <p class="text-slate-600 dark:text-slate-400 mb-4">Numéro de vente: <span id="saleId" class="font-bold text-indigo-600 dark:text-indigo-400"></span></p>
             <p class="text-3xl font-black text-emerald-500 mb-6"><span id="saleTotal">0</span> DH</p>
             <button onclick="closePaymentModal()" class="w-full px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700">Nouvelle Vente</button>
         </div>
