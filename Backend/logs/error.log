@@ -119,3 +119,14 @@ Stack trace:
 [02-Jan-2026 17:33:35 Africa/Casablanca] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\lA\Backend\views\staff.php on line 162
 [02-Jan-2026 17:33:35 Africa/Casablanca] PHP Warning:  Undefined array key "job" in C:\MAMP\htdocs\lA\Backend\views\staff.php on line 162
 [02-Jan-2026 17:33:35 Africa/Casablanca] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\lA\Backend\views\staff.php on line 162
+[02-Jan-2026 17:44:44 Africa/Casablanca] PHP Fatal error:  Uncaught Error: Call to undefined method Database::exec() in C:\MAMP\htdocs\lA\Backend\views\pos.php:11
+Stack trace:
+#0 C:\MAMP\htdocs\lA\Backend\index.php(28): include()
+#1 {main}
+  thrown in C:\MAMP\htdocs\lA\Backend\views\pos.php on line 11
+[02-Jan-2026 18:22:56 Africa/Casablanca] PHP Fatal error:  Uncaught Error: Call to undefined function sanitize() in C:\MAMP\htdocs\lA\Backend\views\pos.php:47
+Stack trace:
+#0 C:\MAMP\htdocs\lA\Backend\index.php(28): include()
+#1 {main}
+  thrown in C:\MAMP\htdocs\lA\Backend\views\pos.php on line 47
+[02-Jan-2026 18:40:36 Africa/Casablanca] PHP Fatal error:  Cannot redeclare getProductEmoji() (previously declared in C:\MAMP\htdocs\lA\Backend\views\pos.php:9) in C:\MAMP\htdocs\lA\Backend\views\pos.php on line 171

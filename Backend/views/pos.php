@@ -82,8 +82,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['action'])) {
         switch ($_POST['action']) {
             case 'add_product':
-                $name = sanitize($_POST['name'] ?? '');
-                $category = sanitize($_POST['category'] ?? '');
+                $name = htmlspecialchars($_POST['name'] ?? '');
+                $category = htmlspecialchars($_POST['category'] ?? '');
                 $price = floatval($_POST['price'] ?? 0);
                 $stock = intval($_POST['stock'] ?? 0);
                 
@@ -94,8 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             case 'update_product':
                 $id = intval($_POST['id']);
-                $name = sanitize($_POST['name'] ?? '');
-                $category = sanitize($_POST['category'] ?? '');
+                $name = htmlspecialchars($_POST['name'] ?? '');
+                $category = htmlspecialchars($_POST['category'] ?? '');
                 $price = floatval($_POST['price'] ?? 0);
                 $stock = intval($_POST['stock'] ?? 0);
                 
@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             case 'process_sale':
                 $items = $_POST['items'] ?? [];
-                $paymentMethod = sanitize($_POST['payment_method'] ?? 'cash');
+                $paymentMethod = htmlspecialchars($_POST['payment_method'] ?? 'cash');
                 
                 if (empty($items)) {
                     echo json_encode(['success' => false, 'message' => 'Panier vide']);
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $itemStmt->execute([
                         $saleId,
                         intval($item['id']),
-                        sanitize($item['name']),
+                        htmlspecialchars($item['name']),
                         intval($item['quantity']),
                         floatval($item['price']),
                         $subtotal
@@ -162,24 +162,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $stmt = $db->conn->query("SELECT * FROM pos_products ORDER BY category, name");
 $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
 $currentPage = 'pos';
-
-function getProductEmoji($category) {
-    switch ($category) {
-        case 'complement': return '💊';
-        case 'snack': return '🍫';
-        case 'boisson': return '🥤';
-        default: return '📦';
-    }
-}
-
-function getProductColorClass($category) {
-    switch ($category) {
-        case 'complement': return 'bg-indigo-50 text-indigo-500';
-        case 'snack': return 'bg-amber-50 text-amber-500';
-        case 'boisson': return 'bg-emerald-50 text-emerald-500';
-        default: return 'bg-slate-50 text-slate-500';
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
