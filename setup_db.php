@@ -4,19 +4,20 @@ require_once 'config/config.php';
 $sql = file_get_contents('setup.sql');
 
 $db = new Database();
-$conn = $db->connect();
+$conn = $db->getConnection();
 
 $queries = explode(';', $sql);
 
 foreach ($queries as $query) {
     if (trim($query) != '') {
-        if ($conn->query($query)) {
+        try {
+            $conn->exec($query);
             echo "Query executed successfully: " . $query . "<br>";
-        } else {
-            echo "Error executing query: " . $conn->error . "<br>";
+        } catch(PDOException $e) {
+            echo "Error executing query: " . $e->getMessage() . "<br>";
         }
     }
 }
 
-$conn->close();
+$conn = null;
 ?>

@@ -99,7 +99,7 @@ class DashboardController {
             
             return array_map(fn($a) => [
                 'name' => $a['name'],
-                'count' => (int)$a['memberCount'],
+                'memberCount' => (int)$a['memberCount'],
                 'color' => '#' . substr(md5($a['name']), 0, 6)
             ], $activities);
         } catch (Exception $e) {

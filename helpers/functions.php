@@ -31,7 +31,7 @@ function sanitizeInput($input) {
  * Redirect to page
  */
 function redirect($page, $params = []) {
-    $url = '/lA/Backend/index.php?page=' . $page;
+    $url = '/maxsporti/index.php?page=' . $page;
     if (!empty($params)) {
         $url .= '&' . http_build_query($params);
     }

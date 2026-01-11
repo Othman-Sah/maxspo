@@ -4,7 +4,10 @@ require_once '../config/config.php';
 echo "<h1>Database Seeder</h1>";
 
 try {
+    $db = new Database();
     $conn = $db->getConnection();
+    
+    $conn->exec('SET FOREIGN_KEY_CHECKS=0;');
     
     // 1. Create Tables
     // Drop existing tables to ensure schema is fresh
@@ -139,6 +142,7 @@ try {
     $conn->exec($sql);
     echo "<p>Notifications seeded.</p>";
 
+    $conn->exec('SET FOREIGN_KEY_CHECKS=1;');
     echo "<h3>Database setup complete! You can now delete this file.</h3>";
 
 } catch (PDOException $e) {

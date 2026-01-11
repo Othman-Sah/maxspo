@@ -1,147 +1,117 @@
-# NEEDSPORT Pro - PHP Backend
+# MaxSporti - PHP Backend
 
 A professional sports club management system built with **PHP, HTML, Tailwind CSS, and JavaScript**.
 
-## 📋 Project Structure
+##  Project Structure
+
+The project follows a custom MVC-like pattern.
 
 ```
-Backend/
-├── config/
-│   ├── config.php          # Main configuration & database setup
-│   ├── Database.php        # MySQLi database connection class
-│   ├── Models.php          # Data model classes
-│   └── MockData.php        # Sample/mock data
-├── controllers/
-│   ├── MembersController.php    # Member management logic
-│   ├── DashboardController.php  # Dashboard data & statistics
-│   └── (more controllers...)
-├── api/
-│   ├── members.php         # REST API endpoints for members
-│   ├── dashboard.php       # REST API endpoints for dashboard
-│   └── (more API routes...)
-├── components/
-│   ├── Components.php      # Reusable UI component functions
-│   └── Layout.php          # Layout & header/sidebar components
-├── helpers/
-│   ├── functions.php       # Global helper functions
-│   └── Validator.php       # Input validation class
-├── views/
-│   ├── login.php           # Login page
-│   ├── dashboard.php       # Main dashboard
-│   ├── members.php         # Members management
-│   ├── sports.php          # Activities/sports management
-│   ├── add-member.php      # Add member form
-│   └── (more views...)
-├── public/
-│   └── uploads/            # User file uploads
-└── index.php               # Main router/entry point
+/
+├── api/                  # REST API endpoints
+│   ├── dashboard.php
+│   ├── journal.php
+│   ├── members.php
+│   └── ...
+├── components/           # Reusable UI component functions
+│   ├── Components.php
+│   └── Layout.php
+├── config/               # Application configuration
+│   ├── config.php        # Main configuration & database setup
+│   ├── Database.php      # MySQLi database connection class
+│   └── Models.php        # Data model classes
+├── controllers/          # Business logic
+│   ├── DashboardController.php
+│   ├── MembersController.php
+│   └── ...
+├── helpers/              # Global helper functions
+│   ├── functions.php
+│   └── Validator.php
+├── logs/                 # Error logs
+│   └── error.log
+├── public/               # (Should be document root)
+├── uploads/              # User file uploads
+│   └── staff/
+├── views/                # PHP-based templates
+│   ├── dashboard.php
+│   ├── members.php
+│   └── ...
+├── run_setup.php         # Automated database setup script
+├── setup.sql             # SQL schema for the database
+├── index.php             # Main router/entry point
+└── README.md             # This file
 ```
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### Prerequisites
-- PHP 7.4+ (with MySQLi)
+- A local web server environment (MAMP, WAMP, XAMPP, or equivalent).
+- PHP 7.4+
 - MySQL 5.7+
-- Apache/Nginx with `.htaccess` support
 
 ### Installation
 
-1. **Copy to MAMP Directory**
-```bash
-cp -r Backend/ /Applications/MAMP/htdocs/lA/Backend
-```
+1.  **Place Files**
+    - Clone this repository or copy all the files into a directory within your web server's document root (e.g., `C:\MAMP\htdocs\la`).
 
-2. **Create Database**
-```sql
-CREATE DATABASE needsport_pro;
-USE needsport_pro;
+2.  **Create Database**
+    - Using a MySQL client (like phpMyAdmin), create a new, empty database. For example, `needsport_pro`.
 
--- Members table
-CREATE TABLE members (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    firstName VARCHAR(100),
-    lastName VARCHAR(100),
-    email VARCHAR(100) UNIQUE,
-    phone VARCHAR(20),
-    age INT,
-    sport VARCHAR(100),
-    status ENUM('actif', 'expirant', 'expire'),
-    expiryDate DATE,
-    joinDate DATE,
-    isLoyal BOOLEAN DEFAULT FALSE,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+3.  **Update Configuration**
+    - Open `config/config.php` and update the database constants with your credentials:
+    ```php
+    // Database Configuration
+    define('DB_HOST', '127.0.0.1'); // Or 'localhost'
+    define('DB_USER', 'your_db_user');
+    define('DB_PASS', 'your_db_password');
+    define('DB_NAME', 'needsport_pro'); // The database you created in step 2
+    define('DB_PORT', 3306);
+    ```
 
--- Activities table
-CREATE TABLE activities (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100),
-    description TEXT,
-    monthlyPrice INT,
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+4.  **Run Setup Script**
+    - In your web browser, navigate to the `setup_db.php` script to automatically create all the necessary database tables.
+    - **URL:** `http://localhost/maxsporti/setup_db.php` (adjust the path if you named the folder differently).
+    - You should see a list of "Query executed successfully" messages.
+    - **URL:** `http://localhost/maxsporti/install/seed.php`
+    - By entering that URL you are seedign database by mock data to test the site.
 
--- Payments table
-CREATE TABLE payments (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    memberId INT,
-    amount INT,
-    date DATE,
-    method ENUM('especes', 'carte', 'virement', 'cheque'),
-    status ENUM('valide', 'en_attente', 'annule'),
-    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (memberId) REFERENCES members(id)
-);
+5.  **Secure Your Setup**
+    - After setup is complete, it is highly recommended to **delete or rename `setup_db.php` and `setup.sql`** to prevent accidental or malicious re-execution.
 
--- Add more tables as needed
-```
+6.  **Access Application**
+    - You can now access the main application.
+    - **URL:** `http://localhost/maxsporti`
+    - **Default Login:**
+        - **Email:** `admin@needsport.ma`
+        - **Password:** `password`
 
-3. **Update Configuration**
-Edit `config/config.php` with your database credentials:
-```php
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', 'password');
-define('DB_NAME', 'needsport_pro');
-```
+##  Features
 
-4. **Access Application**
-```
-http://localhost/lA/Backend/index.php
-```
-
-### Default Credentials
-- **Email:** `admin@needsport.ma`
-- **Password:** `password`
-
-## 📚 Features
-
-### ✅ Implemented
+###  Implemented
 - ✓ Login/Authentication system
 - ✓ Dashboard with statistics
 - ✓ Member management (view, filter)
 - ✓ Activities/Sports management
-- ✓ Mock data system
 - ✓ Component-based UI system
 - ✓ Form validation
 - ✓ CSRF protection
-- ✓ API endpoints structure
+- ✓ Automated database installer
+- ✓ Full database integration for all tables
+- ✓ Financial reports
+- ✓ Staff management
+- ✓ POS system
+- ✓ Schedule planning
 
-### 🔄 In Progress / To Do
-- [ ] Full database integration for all tables
+###  In Progress / To Do
 - [ ] Member CRUD operations
 - [ ] Payment tracking
-- [ ] Financial reports
-- [ ] Staff management
-- [ ] POS system
-- [ ] Schedule planning
 - [ ] Notifications system
 - [ ] Settings/configuration
 - [ ] Export to PDF/CSV
 - [ ] User role management
 - [ ] Activity logging
 
-## 🔧 API Endpoints
+##  API Endpoints
 
 ### Members API
 - `GET /api/members.php?action=list` - Get all members
@@ -157,78 +127,7 @@ http://localhost/lA/Backend/index.php
 - `GET /api/dashboard.php?action=sports` - Sport statistics
 - `GET /api/dashboard.php?action=notifications` - Get notifications
 
-## 📝 Code Examples
-
-### Using Helper Functions
-```php
-<?php
-require_once 'config/config.php';
-
-// Get and sanitize input
-$email = getParam('email'); // From $_GET
-$name = postParam('name');  // From $_POST
-
-// Format values
-echo formatCurrency(1500);  // 1 500 DH
-echo formatDate('2024-06-15'); // 15/06/2024
-
-// Validation
-$validator = new Validator();
-if (!$validator->validateEmail($email)) {
-    echo $validator->getErrors()['email'];
-}
-
-// Redirect
-redirect('members', ['status' => 'actif']);
-?>
-```
-
-### Creating a Controller
-```php
-<?php
-class PaymentsController {
-    private $db;
-    
-    public function __construct($database) {
-        $this->db = $database;
-    }
-    
-    public function getPayments($filters = []) {
-        // Database query logic
-    }
-}
-?>
-```
-
-### Using Components
-```php
-<?php
-require_once 'components/Components.php';
-
-// Render stat card
-renderStatCard('Total Revenue', 125400, 12.5, 'dollar', 'emerald', 'DH ');
-
-// Render status badge
-renderStatusBadge('actif');
-
-// Render button
-renderButton('Save', 'primary', 'submitForm()', '💾');
-?>
-```
-
-## 🎨 UI Components
-
-### Available Components
-- `renderStatCard()` - Statistics card
-- `renderMemberRow()` - Table row for member
-- `renderActivityCard()` - Activity card
-- `renderStatusBadge()` - Status indicator
-- `renderAlert()` - Alert message
-- `renderButton()` - Button
-- `renderHeader()` - Top navigation
-- `renderSidebar()` - Left sidebar
-
-## 🔐 Security Features
+##  Security Features
 
 - ✓ SQL injection prevention (MySQLi prepared statements)
 - ✓ XSS protection (htmlspecialchars)
@@ -237,26 +136,5 @@ renderButton('Save', 'primary', 'submitForm()', '💾');
 - ✓ Input validation & sanitization
 - ✓ Error logging
 
-## 📱 Responsive Design
-
-All views are built with Tailwind CSS and are fully responsive:
-- Mobile (< 768px)
-- Tablet (768px - 1024px)
-- Desktop (> 1024px)
-
-## 🌐 Browser Support
-
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
-
-## 📧 Contact & Support
-
-For issues or questions about the PHP backend, contact the development team.
-
 ---
-
-**Version:** 2.4.0  
-**Last Updated:** December 2024  
-**Language:** PHP 7.4+
+**Version:** 2.4.0

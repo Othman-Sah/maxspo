@@ -37,7 +37,7 @@ define('ADMIN_ROLE', 'admin');
 define('STAFF_ROLE', 'staff');
 
 // API Settings
-define('API_URL', 'http://localhost/lA/Backend/api');
+define('API_URL', 'http://localhost/maxsporti/api');
 define('UPLOAD_DIR', ROOT_PATH . '/public/uploads');
 
 // Error reporting
@@ -71,14 +71,14 @@ function isLoggedIn() {
 
 function requireLogin() {
     if (!isLoggedIn()) {
-        header('Location: /lA/Backend/index.php?page=login');
+        header('Location: /maxsporti/index.php?page=login');
         exit();
     }
 }
 
 function logout() {
     session_destroy();
-    header('Location: /lA/Backend/index.php?page=login');
+    header('Location: /maxsporti/index.php?page=login');
     exit();
 }
 ?>

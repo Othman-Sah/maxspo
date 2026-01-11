@@ -6,12 +6,12 @@ echo "🏆 NEEDSPORT Pro - Setup"
 echo "========================"
 
 # Create necessary directories
-mkdir -p Backend/public/uploads
-mkdir -p Backend/logs
+mkdir -p /public/uploads
+mkdir -p /logs
 
 # Set permissions
-chmod 755 Backend/public/uploads
-chmod 755 Backend/logs
+chmod 755 /public/uploads
+chmod 755 /logs
 
 echo "✓ Directories created"
 
@@ -24,10 +24,10 @@ echo "1. Create MySQL Database:"
 echo "   mysql -u root -p"
 echo "   CREATE DATABASE needsport_pro;"
 echo ""
-echo "2. Update database credentials in Backend/config/config.php"
+echo "2. Update database credentials in /config/config.php"
 echo ""
 echo "3. Access application at:"
-echo "   http://localhost/lA/Backend/"
+echo "   http://localhost/maxsporti/"
 echo ""
 echo "4. Login with:"
 echo "   Email: admin@needsport.ma"

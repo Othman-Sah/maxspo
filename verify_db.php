@@ -2,13 +2,18 @@
 require_once 'config/config.php';
 
 $db = new Database();
-$conn = $db->connect();
+$conn = $db->getConnection();
 
-$result = $conn->query("SHOW TABLES");
+try {
+    $stmt = $conn->query("SHOW TABLES");
 
-while ($row = $result->fetch_array()) {
-    echo $row[0] . "<br>";
+    echo "Tables in database:<br>";
+    while ($row = $stmt->fetch(PDO::FETCH_NUM)) {
+        echo $row[0] . "<br>";
+    }
+} catch(PDOException $e) {
+    die("Error verifying database: " . $e->getMessage());
 }
 
-$conn->close();
+$conn = null;
 ?>

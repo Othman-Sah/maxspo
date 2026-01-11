@@ -13,7 +13,7 @@ global $db;
 $dashboardCtrl = new DashboardController($db);
 $financialsCtrl = new FinancialsController($db);
 
-$activities = $dashboardCtrl->getActivities();
+$activities = $dashboardCtrl->getSportStats();
 $summary = $financialsCtrl->getSummary();
 $revenueData = $financialsCtrl->getRevenueData();
 

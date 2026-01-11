@@ -95,8 +95,8 @@ Stack trace:
 [02-Jan-2026 12:37:54 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
 [02-Jan-2026 12:37:55 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
 [02-Jan-2026 12:49:25 Africa/Casablanca] PHP Deprecated:  Optional parameter $description declared before required parameter $content is implicitly treated as a required parameter in C:\MAMP\htdocs\lA\Backend\components\Layout.php on line 124
-[02-Jan-2026 13:18:57 Africa/Casablanca] PHP Warning:  include(C:\MAMP\htdocs\lA\Backend/config/MockData.php): Failed to open stream: No such file or directory in C:\MAMP\htdocs\lA\Backend\components\Notifications.php on line 5
-[02-Jan-2026 13:18:57 Africa/Casablanca] PHP Warning:  include(): Failed opening 'C:\MAMP\htdocs\lA\Backend/config/MockData.php' for inclusion (include_path='.;C:\php\pear') in C:\MAMP\htdocs\lA\Backend\components\Notifications.php on line 5
+[02-Jan-2026 13:18:57 Africa/Casablanca] PHP Warning:  include(C:\MAMP\htdocs\lA\/config/MockData.php): Failed to open stream: No such file or directory in C:\MAMP\htdocs\lA\Backend\components\Notifications.php on line 5
+[02-Jan-2026 13:18:57 Africa/Casablanca] PHP Warning:  include(): Failed opening 'C:\MAMP\htdocs\lA\/config/MockData.php' for inclusion (include_path='.;C:\php\pear') in C:\MAMP\htdocs\lA\Backend\components\Notifications.php on line 5
 [02-Jan-2026 13:37:18 Africa/Casablanca] PHP Warning:  require_once(../controllers/MembersController.php): Failed to open stream: No such file or directory in C:\MAMP\htdocs\lA\Backend\api\members.php on line 3
 [02-Jan-2026 13:37:18 Africa/Casablanca] PHP Fatal error:  Uncaught Error: Failed opening required '../controllers/MembersController.php' (include_path='.;C:\php\pear') in C:\MAMP\htdocs\lA\Backend\api\members.php:3
 Stack trace:
@@ -238,3 +238,32 @@ Stack trace:
 [09-Jan-2026 19:21:55 Africa/Casablanca] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\lA\Backend\views\financials-payments.php on line 342
 [09-Jan-2026 19:21:55 Africa/Casablanca] PHP Deprecated:  substr(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\lA\Backend\views\financials-payments.php on line 342
 [09-Jan-2026 19:21:55 Africa/Casablanca] PHP Deprecated:  htmlspecialchars(): Passing null to parameter #1 ($string) of type string is deprecated in C:\MAMP\htdocs\lA\Backend\views\financials-payments.php on line 342
+[11-Jan-2026 12:31:30 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 100
+[11-Jan-2026 12:31:30 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 103
+[11-Jan-2026 12:31:30 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 100
+[11-Jan-2026 12:31:30 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 103
+[11-Jan-2026 12:31:30 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 100
+[11-Jan-2026 12:31:30 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 103
+[11-Jan-2026 12:31:30 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 100
+[11-Jan-2026 12:31:30 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 103
+[11-Jan-2026 12:31:30 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 100
+[11-Jan-2026 12:31:30 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 103
+[11-Jan-2026 12:31:30 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 100
+[11-Jan-2026 12:31:30 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 103
+[11-Jan-2026 12:32:08 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 100
+[11-Jan-2026 12:32:08 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 103
+[11-Jan-2026 12:32:08 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 100
+[11-Jan-2026 12:32:08 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 103
+[11-Jan-2026 12:32:08 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 100
+[11-Jan-2026 12:32:08 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 103
+[11-Jan-2026 12:32:08 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 100
+[11-Jan-2026 12:32:08 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 103
+[11-Jan-2026 12:32:08 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 100
+[11-Jan-2026 12:32:08 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 103
+[11-Jan-2026 12:32:08 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 100
+[11-Jan-2026 12:32:08 Africa/Casablanca] PHP Warning:  Undefined array key "memberCount" in C:\MAMP\htdocs\lA\views\dashboard.php on line 103
+[11-Jan-2026 13:18:06 Africa/Casablanca] PHP Fatal error:  Uncaught Error: Call to undefined method Database::connect() in C:\MAMP\htdocs\lA\run_setup.php:7
+Stack trace:
+#0 {main}
+  thrown in C:\MAMP\htdocs\lA\run_setup.php on line 7
+[11-Jan-2026 13:23:26 Africa/Casablanca] Members fetch error: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'firstName' in 'field list'
